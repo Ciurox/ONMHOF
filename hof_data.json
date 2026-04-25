@@ -1,0 +1,1032 @@
+{
+  "hof": [
+    {
+      "nume": "VILA ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 5,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "BUD VIOREL ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 4,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012,
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "MAZĂRE EMANUEL",
+      "judet": "ARGEȘ",
+      "aur": 4,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "GHIBU DAVID",
+      "judet": "BUCUREȘTI",
+      "aur": 4,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "DIACONESCU ALEXANDRU TASHI TSERING",
+      "judet": "CLUJ",
+      "aur": 3,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024,
+        2026
+      ]
+    },
+    {
+      "nume": "TÎRLIȘAN IOAN PAUL PETRU",
+      "judet": "BISTRIȚA-NĂSĂUD",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2016,
+        2017,
+        2019
+      ]
+    },
+    {
+      "nume": "STAN IONUȚ GABRIEL",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "MELEGA TEODOR",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "ZAHARIA MARA IOANA",
+      "judet": "GALAȚI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "ANGHEL DAVID ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "CHIRIȚĂ ANDREI GIOVANI",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "NEACȘU MATEI",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "ȘUNĂ ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "CIOBOTEA ALEXANDRU",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "STROE IOANA",
+      "judet": "BUCUREȘTI",
+      "aur": 3,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "LAZĂR OVIDIU MARIAN",
+      "judet": "HUNEDOARA",
+      "aur": 2,
+      "argint": 2,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "nume": "BODOR MÁTYÁS",
+      "judet": "HARGHITA",
+      "aur": 2,
+      "argint": 2,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "MITROI AIDA",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 2,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "CIUREA PAVEL",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 1,
+      "ani": [
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "nume": "CONSTANTINESCU PETRU",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2010,
+        2011,
+        2013
+      ]
+    },
+    {
+      "nume": "Bumbacea Radu",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2010,
+        2011,
+        2012
+      ]
+    },
+    {
+      "nume": "Cerrahoglu Omer",
+      "judet": "MARAMUREȘ",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2010,
+        2011,
+        2012
+      ]
+    },
+    {
+      "nume": "TRAN BACH HAI",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012,
+        2013
+      ]
+    },
+    {
+      "nume": "MAGALIE ANDREEA",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012,
+        2013
+      ]
+    },
+    {
+      "nume": "BOCANU MARIUS",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2012,
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "DIACONU SIMONA",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2012,
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "ION FILIP",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2014,
+        2016,
+        2017
+      ]
+    },
+    {
+      "nume": "PASCADI ALEXANDRU",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2014,
+        2016,
+        2017
+      ]
+    },
+    {
+      "nume": "TUCHILUȘ VLAD",
+      "judet": "IAȘI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2016,
+        2017,
+        2019
+      ]
+    },
+    {
+      "nume": "BALAUR FRANCESCA MARIA",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "GRESOIU LIVIU ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "SPĂTARU VLAD TITUS",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "STOLERIU RADU IONUȚ",
+      "judet": "IAȘI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2025
+      ]
+    },
+    {
+      "nume": "REBENGIUC MIRCEA MAXIM",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024,
+        2026
+      ]
+    },
+    {
+      "nume": "ȚUI ROBERT ANDREI",
+      "judet": "ARGEȘ",
+      "aur": 2,
+      "argint": 1,
+      "bronz": 0,
+      "ani": [
+        2024,
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "BARBU MIHAI",
+      "judet": "VÂLCEA",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 1,
+      "ani": [
+        2010,
+        2012,
+        2017
+      ]
+    },
+    {
+      "nume": "PAȘA ANDREI",
+      "judet": "IAȘI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 1,
+      "ani": [
+        2014,
+        2016,
+        2017
+      ]
+    },
+    {
+      "nume": "Ardelean Diana",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2010,
+        2012
+      ]
+    },
+    {
+      "nume": "Dragoi Octav",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012
+      ]
+    },
+    {
+      "nume": "ILIE ANDREI",
+      "judet": "PRAHOVA",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2012,
+        2013
+      ]
+    },
+    {
+      "nume": "AVĂDANEI OVIDIU",
+      "judet": "IAȘI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "MUSCĂ PAUL GABRIEL",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "GHIGHECI ANDREI",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2016,
+        2017
+      ]
+    },
+    {
+      "nume": "CRIȘAN DRAGOȘ",
+      "judet": "CLUJ",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2016,
+        2017
+      ]
+    },
+    {
+      "nume": "NOVAC SERGIU",
+      "judet": "TIMIȘ",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2017,
+        2019
+      ]
+    },
+    {
+      "nume": "TIMOFTE ALEXANDRA",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2017,
+        2019
+      ]
+    },
+    {
+      "nume": "ILIE M. ALEXANDRU-GABRIEL",
+      "judet": "PRAHOVA",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2018,
+        2019
+      ]
+    },
+    {
+      "nume": "ABIBULA AISEL",
+      "judet": "CONSTANȚA",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2019,
+        2022
+      ]
+    },
+    {
+      "nume": "CONSTANTINESCU IUSTINIAN CRISTIAN",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023
+      ]
+    },
+    {
+      "nume": "PANĂ LUCA",
+      "judet": "BUZĂU",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023
+      ]
+    },
+    {
+      "nume": "MOLDOVAN ANDREI",
+      "judet": "DOLJ",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023
+      ]
+    },
+    {
+      "nume": "LECOIU RADU ANDREI",
+      "judet": "DOLJ",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2022,
+        2023
+      ]
+    },
+    {
+      "nume": "DRAGOȘ VICTOR VASILE",
+      "judet": "MARAMUREȘ",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "nume": "PIȚU EDUARD",
+      "judet": "ALBA",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "DRĂGUȘANU RAREȘ",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "MATHE DAVID",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "SANDEA IANCU-IOAN",
+      "judet": "BUCUREȘTI",
+      "aur": 2,
+      "argint": 0,
+      "bronz": 0,
+      "ani": [
+        2025,
+        2026
+      ]
+    },
+    {
+      "nume": "ABU BAKER ABDALAH",
+      "judet": "BUCUREȘTI",
+      "aur": 1,
+      "argint": 3,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012,
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "CHIRAC CRISTIAN",
+      "judet": "GALAȚI",
+      "aur": 1,
+      "argint": 3,
+      "bronz": 0,
+      "ani": [
+        2011,
+        2012,
+        2013,
+        2014
+      ]
+    },
+    {
+      "nume": "BOIANGIU ANA",
+      "judet": "BUCUREȘTI",
+      "aur": 1,
+      "argint": 2,
+      "bronz": 1,
+      "ani": [
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    }
+  ],
+  "judete": [
+    {
+      "judet": "BUCUREȘTI",
+      "aur": 196,
+      "argint": 245,
+      "bronz": 239,
+      "scor": 1954
+    },
+    {
+      "judet": "IAȘI",
+      "aur": 22,
+      "argint": 25,
+      "bronz": 40,
+      "scor": 225
+    },
+    {
+      "judet": "CONSTANȚA",
+      "aur": 17,
+      "argint": 30,
+      "bronz": 38,
+      "scor": 213
+    },
+    {
+      "judet": "DOLJ",
+      "aur": 14,
+      "argint": 36,
+      "bronz": 73,
+      "scor": 251
+    },
+    {
+      "judet": "PRAHOVA",
+      "aur": 13,
+      "argint": 21,
+      "bronz": 32,
+      "scor": 160
+    },
+    {
+      "judet": "CLUJ",
+      "aur": 13,
+      "argint": 20,
+      "bronz": 28,
+      "scor": 153
+    },
+    {
+      "judet": "ARGEȘ",
+      "aur": 12,
+      "argint": 22,
+      "bronz": 45,
+      "scor": 171
+    },
+    {
+      "judet": "MARAMUREȘ",
+      "aur": 11,
+      "argint": 27,
+      "bronz": 20,
+      "scor": 156
+    },
+    {
+      "judet": "TIMIȘ",
+      "aur": 7,
+      "argint": 14,
+      "bronz": 33,
+      "scor": 110
+    },
+    {
+      "judet": "GALAȚI",
+      "aur": 7,
+      "argint": 9,
+      "bronz": 20,
+      "scor": 82
+    },
+    {
+      "judet": "VÂLCEA",
+      "aur": 7,
+      "argint": 7,
+      "bronz": 17,
+      "scor": 73
+    },
+    {
+      "judet": "OLT",
+      "aur": 5,
+      "argint": 6,
+      "bronz": 23,
+      "scor": 66
+    },
+    {
+      "judet": "MUREȘ",
+      "aur": 4,
+      "argint": 20,
+      "bronz": 18,
+      "scor": 98
+    },
+    {
+      "judet": "BACĂU",
+      "aur": 4,
+      "argint": 14,
+      "bronz": 25,
+      "scor": 87
+    },
+    {
+      "judet": "BUZĂU",
+      "aur": 4,
+      "argint": 11,
+      "bronz": 21,
+      "scor": 74
+    },
+    {
+      "judet": "VRANCEA",
+      "aur": 4,
+      "argint": 4,
+      "bronz": 8,
+      "scor": 40
+    },
+    {
+      "judet": "ALBA",
+      "aur": 4,
+      "argint": 1,
+      "bronz": 8,
+      "scor": 31
+    },
+    {
+      "judet": "HUNEDOARA",
+      "aur": 3,
+      "argint": 10,
+      "bronz": 10,
+      "scor": 55
+    },
+    {
+      "judet": "BRAȘOV",
+      "aur": 3,
+      "argint": 9,
+      "bronz": 14,
+      "scor": 56
+    },
+    {
+      "judet": "DÂMBOVIȚA",
+      "aur": 3,
+      "argint": 5,
+      "bronz": 16,
+      "scor": 46
+    },
+    {
+      "judet": "BISTRIȚA-NĂSĂUD",
+      "aur": 3,
+      "argint": 1,
+      "bronz": 7,
+      "scor": 25
+    },
+    {
+      "judet": "BOTOȘANI",
+      "aur": 2,
+      "argint": 13,
+      "bronz": 21,
+      "scor": 70
+    },
+    {
+      "judet": "SUCEAVA",
+      "aur": 2,
+      "argint": 12,
+      "bronz": 19,
+      "scor": 65
+    },
+    {
+      "judet": "GORJ",
+      "aur": 2,
+      "argint": 11,
+      "bronz": 14,
+      "scor": 57
+    },
+    {
+      "judet": "NEAMȚ",
+      "aur": 2,
+      "argint": 10,
+      "bronz": 12,
+      "scor": 52
+    },
+    {
+      "judet": "HARGHITA",
+      "aur": 2,
+      "argint": 6,
+      "bronz": 6,
+      "scor": 34
+    },
+    {
+      "judet": "SIBIU",
+      "aur": 2,
+      "argint": 5,
+      "bronz": 21,
+      "scor": 46
+    },
+    {
+      "judet": "ARAD",
+      "aur": 2,
+      "argint": 4,
+      "bronz": 11,
+      "scor": 33
+    },
+    {
+      "judet": "BIHOR",
+      "aur": 1,
+      "argint": 8,
+      "bronz": 18,
+      "scor": 47
+    },
+    {
+      "judet": "SATU MARE",
+      "aur": 1,
+      "argint": 6,
+      "bronz": 10,
+      "scor": 33
+    },
+    {
+      "judet": "SĂLAJ",
+      "aur": 1,
+      "argint": 1,
+      "bronz": 7,
+      "scor": 15
+    },
+    {
+      "judet": "COVASNA",
+      "aur": 0,
+      "argint": 5,
+      "bronz": 5,
+      "scor": 20
+    },
+    {
+      "judet": "VASLUI",
+      "aur": 0,
+      "argint": 3,
+      "bronz": 17,
+      "scor": 26
+    },
+    {
+      "judet": "BRĂILA",
+      "aur": 0,
+      "argint": 3,
+      "bronz": 14,
+      "scor": 23
+    },
+    {
+      "judet": "MEHEDINȚI",
+      "aur": 0,
+      "argint": 3,
+      "bronz": 11,
+      "scor": 20
+    },
+    {
+      "judet": "TULCEA",
+      "aur": 0,
+      "argint": 2,
+      "bronz": 1,
+      "scor": 7
+    },
+    {
+      "judet": "TELEORMAN",
+      "aur": 0,
+      "argint": 1,
+      "bronz": 8,
+      "scor": 11
+    },
+    {
+      "judet": "GIURGIU",
+      "aur": 0,
+      "argint": 1,
+      "bronz": 5,
+      "scor": 8
+    },
+    {
+      "judet": "IALOMIȚA",
+      "aur": 0,
+      "argint": 1,
+      "bronz": 4,
+      "scor": 7
+    },
+    {
+      "judet": "ILFOV",
+      "aur": 0,
+      "argint": 0,
+      "bronz": 2,
+      "scor": 2
+    },
+    {
+      "judet": "CARAȘ-SEVERIN",
+      "aur": 0,
+      "argint": 0,
+      "bronz": 2,
+      "scor": 2
+    },
+    {
+      "judet": "CĂLĂRAȘI",
+      "aur": 0,
+      "argint": 0,
+      "bronz": 1,
+      "scor": 1
+    }
+  ],
+  "total_elevi": 3514,
+  "total_medaliati": 2155,
+  "total_judete": 42,
+  "ani": [
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2016,
+    2017,
+    2018,
+    2019,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ]
+}

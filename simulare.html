@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulare ONM 2010–2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #050509;
+  --bg2:     #0a0a14;
+  --bg3:     rgba(14,14,24,0.8);
+  --border:  rgba(120,90,255,0.14);
+  --border2: rgba(150,110,255,0.3);
+  --text:    #ede8ff;
+  --muted:   #605878;
+  --accent:  #9b6dff;
+  --accent2: #c4a5ff;
+  --teal:    #2dd4bf;
+  --pink:    #e879f9;
+  --gold:    #f5a623;
+  --gold2:   #ffd27a;
+  --silver:  #9db4c0;
+  --bronze:  #c4824a;
+  --green:   #22d3a2;
+  --red:     #f47068;
+  --glow:    rgba(155,109,255,0.18);
+  --glow2:   rgba(155,109,255,0.45);
+  --f: 'Outfit', sans-serif;
+  --m: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f);
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ════ CUSTOM CURSOR ════ */
+#cur, #cur2 {
+  position:fixed; border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+}
+#cur  { width:10px; height:10px; background:var(--accent2); mix-blend-mode:screen; transition:width .15s,height .15s,background .2s; }
+#cur2 { width:32px; height:32px; border:1.5px solid rgba(155,109,255,0.5); transition:transform .2s cubic-bezier(.22,1,.36,1),width .25s,height .25s,border-color .25s; }
+body:has(a:hover) #cur, body:has(button:hover) #cur { width:18px; height:18px; background:var(--pink); }
+body:has(a:hover) #cur2, body:has(button:hover) #cur2 { width:48px; height:48px; border-color:var(--pink); }
+body:has(.pill:hover) #cur { background:var(--gold); }
+
+/* ════ AURORA CANVAS ════ */
+#aurora { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* ════ GRID ════ */
+.grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(120,90,255,.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120,90,255,.032) 1px, transparent 1px);
+  background-size:56px 56px;
+  animation: gridScroll 40s linear infinite;
+}
+@keyframes gridScroll { to { background-position: 56px 56px; } }
+
+/* ════ ORBS ════ */
+.orb {
+  position:fixed; border-radius:50%; filter:blur(90px);
+  pointer-events:none; z-index:0;
+  animation: orbDrift var(--t,22s) ease-in-out infinite alternate;
+}
+.o1 { width:600px; height:500px; top:-15%; left:-12%; background:radial-gradient(circle,rgba(80,40,200,.1),transparent 65%); --t:28s; }
+.o2 { width:450px; height:400px; bottom:-10%; right:-8%;  background:radial-gradient(circle,rgba(60,20,160,.09),transparent 65%); --t:20s; }
+.o3 { width:280px; height:280px; top:45%;  left:58%;     background:radial-gradient(circle,rgba(232,121,249,.06),transparent 65%); --t:14s; }
+@keyframes orbDrift { to { transform:translate(40px,-50px) scale(1.12); } }
+
+/* ════ PARTICLES ════ */
+.px { position:fixed; border-radius:50%; pointer-events:none; z-index:0;
+      opacity:0; animation:pxRise var(--d,10s) linear var(--dl,0s) infinite; }
+@keyframes pxRise {
+  0%   { transform:translateY(102vh) translateX(0) scale(0); opacity:0; }
+  5%   { opacity:var(--op,.35); transform:translateY(95vh) scale(1); }
+  90%  { opacity:var(--op,.35); }
+  100% { transform:translateY(-5vh) translateX(var(--dx,30px)) scale(.5); opacity:0; }
+}
+
+/* ════ NAV ════ */
+nav {
+  position:sticky; top:0; z-index:100;
+  height:58px; padding:0 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(5,5,9,.85); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+nav::after {
+  content:''; position:absolute; bottom:-1px; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--pink) 70%, transparent 100%);
+  background-size:200% 100%;
+  animation:navLine 4s linear infinite;
+}
+@keyframes navLine { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+.nav-logo {
+  font-family:var(--m); font-size:13px; color:var(--accent2);
+  text-decoration:none; display:flex; align-items:center; gap:.7rem; letter-spacing:.06em;
+}
+.gem {
+  width:20px; height:20px; position:relative;
+  animation:gemHue 8s linear infinite;
+}
+@keyframes gemHue { to { filter:hue-rotate(360deg) drop-shadow(0 0 6px var(--accent)); } }
+
+.nav-back {
+  font-family:var(--m); font-size:12px; color:var(--muted);
+  text-decoration:none; letter-spacing:.06em;
+  transition:color .25s; position:relative; padding:.3rem .5rem;
+}
+.nav-back::after {
+  content:''; position:absolute; bottom:0; left:.5rem; right:.5rem; height:1px;
+  background:var(--accent2); transform:scaleX(0); transition:transform .3s;
+}
+.nav-back:hover { color:var(--accent2); }
+.nav-back:hover::after { transform:scaleX(1); }
+
+/* ════ TIMER BAR ════ */
+#tbar {
+  position:sticky; top:58px; z-index:99;
+  height:52px; padding:0 2rem;
+  display:flex; align-items:center; gap:1rem;
+  background:rgba(5,5,9,.92); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:background .4s, border-color .4s;
+}
+#tbar.hidden { display:none; }
+#tbar.warn   { background:rgba(16,4,4,.95); border-bottom-color:rgba(244,112,104,.3); }
+
+.tdisp {
+  font-family:var(--m); font-size:1.55rem; letter-spacing:.1em;
+  color:var(--accent2); position:relative;
+  text-shadow:0 0 18px rgba(155,109,255,.55), 0 0 40px rgba(155,109,255,.2);
+  transition:color .4s, text-shadow .4s;
+}
+.tdisp.warn { color:var(--red); text-shadow:0 0 18px rgba(244,112,104,.7); }
+.tdisp.crit { color:#ff3a3a; animation:critBlink .55s infinite; }
+@keyframes critBlink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.tbar-mid { flex:1; max-width:260px; }
+.tprog { height:4px; background:rgba(120,90,255,.15); border-radius:99px; overflow:hidden; position:relative; }
+.tprog::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+  background-size:200% 100%; animation:shim 2s linear infinite;
+}
+@keyframes shim { to { background-position:-200% 0; } }
+.tfill {
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,#6d28d9,var(--accent),var(--accent2));
+  box-shadow:0 0 10px rgba(155,109,255,.8), 0 0 20px rgba(155,109,255,.3);
+  transition:width 1s linear, background .5s;
+}
+.tfill.warn { background:linear-gradient(90deg,#b91c1c,var(--red)); box-shadow:0 0 10px rgba(244,112,104,.9); }
+
+/* ════ BUTTONS ════ */
+.btn {
+  font-family:var(--m); font-size:12px; letter-spacing:.06em;
+  padding:.48rem 1rem; border-radius:8px;
+  border:1px solid var(--border2); background:transparent;
+  color:var(--accent2); cursor:none;
+  transition:all .25s; white-space:nowrap; position:relative; overflow:hidden;
+}
+.btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(155,109,255,.15),transparent);
+  opacity:0; transition:opacity .25s;
+}
+.btn:hover { border-color:var(--accent); box-shadow:0 0 16px var(--glow2), inset 0 0 12px rgba(155,109,255,.06); transform:translateY(-1px); }
+.btn:hover::before { opacity:1; }
+.btn.danger { border-color:rgba(244,112,104,.38); color:var(--red); }
+.btn.danger:hover { background:rgba(244,112,104,.08); box-shadow:0 0 14px rgba(244,112,104,.35); }
+
+.bigbtn {
+  font-family:var(--f); font-size:16px; font-weight:700; letter-spacing:.04em;
+  padding:.95rem 2.8rem; border-radius:12px; border:none; cursor:none;
+  background:linear-gradient(135deg,#5b21b6,var(--accent),#9333ea);
+  background-size:200% 200%;
+  color:#fff; position:relative; overflow:hidden;
+  box-shadow:0 4px 28px rgba(91,33,182,.45), 0 0 50px rgba(155,109,255,.18);
+  transition:transform .3s,box-shadow .3s;
+  animation:btnPulse 4s ease-in-out infinite;
+}
+@keyframes btnPulse {
+  0%,100% { box-shadow:0 4px 28px rgba(91,33,182,.45),0 0 50px rgba(155,109,255,.18); }
+  50%      { box-shadow:0 6px 40px rgba(91,33,182,.65),0 0 70px rgba(155,109,255,.35); }
+}
+.bigbtn::before {
+  content:'';
+  position:absolute; top:-60%; left:-70%; width:45%; height:220%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+  transform:skewX(-18deg);
+  animation:shine 3.5s ease-in-out infinite;
+}
+@keyframes shine { 0%{left:-70%;opacity:0} 25%{opacity:1} 65%,100%{left:150%;opacity:0} }
+.bigbtn:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 10px 50px rgba(91,33,182,.6),0 0 80px rgba(155,109,255,.4); }
+
+/* ════ STEP 1 SELECT ════ */
+#s1 { max-width:820px; margin:0 auto; padding:5rem 2rem 4rem; position:relative; z-index:2; }
+
+.eyebrow {
+  font-family:var(--m); font-size:10px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--accent); display:flex; align-items:center; gap:.6rem; margin-bottom:.7rem;
+  opacity:0; animation:fromLeft .6s cubic-bezier(.22,1,.36,1) .1s forwards;
+}
+.eyebrow::before { content:''; width:22px; height:1px; background:var(--accent); }
+
+@keyframes fromLeft  { from{opacity:0;transform:translateX(-22px)} to{opacity:1;transform:none} }
+@keyframes fromBelow { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:none} }
+@keyframes popIn     { from{opacity:0;transform:scale(.9) translateY(16px)} to{opacity:1;transform:none} }
+
+.hero-title {
+  font-family:var(--f); font-weight:900; line-height:1.04;
+  font-size:clamp(2.6rem,5.5vw,4.2rem); margin-bottom:3.5rem;
+  opacity:0; animation:fromBelow .8s cubic-bezier(.22,1,.36,1) .22s forwards;
+}
+.ht-main {
+  display:block;
+  background:linear-gradient(120deg,#fff 0%,var(--accent2) 50%,var(--pink) 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:gradSwirl 7s ease infinite;
+}
+@keyframes gradSwirl { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.ht-sub {
+  display:block; font-size:.56em; font-style:italic; font-weight:400; margin-top:.15em;
+  background:linear-gradient(120deg,var(--accent2),var(--teal));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+
+.sec-label {
+  font-family:var(--m); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:1rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+.sel-sec {
+  margin-bottom:2.5rem;
+  opacity:0; animation:fromBelow .6s cubic-bezier(.22,1,.36,1) var(--dl,.4s) forwards;
+}
+
+.pills { display:flex; gap:.7rem; flex-wrap:wrap; }
+.pill {
+  font-family:var(--m); font-size:13px; letter-spacing:.06em;
+  padding:.65rem 1.5rem; border-radius:10px;
+  border:1px solid var(--border2); background:var(--bg2);
+  color:var(--muted); cursor:none;
+  transition:all .3s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden;
+}
+.pill::after {
+  content:''; position:absolute; bottom:0; left:50%; right:50%; height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  box-shadow:0 0 8px var(--accent);
+  transition:left .3s,right .3s;
+}
+.pill:hover { color:var(--text); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 16px rgba(155,109,255,.2); }
+.pill:hover::after { left:0; right:0; }
+.pill.sel {
+  background:rgba(155,109,255,.14); border-color:var(--accent);
+  color:var(--accent2); transform:translateY(-2px);
+  box-shadow:0 0 20px var(--glow),0 4px 16px rgba(0,0,0,.3);
+}
+.pill.sel::after { left:0; right:0; }
+.badge {
+  display:inline-block; margin-left:.4rem; font-size:8px; padding:2px 5px;
+  border-radius:4px; background:rgba(245,166,35,.2); color:var(--gold);
+  letter-spacing:.08em; vertical-align:middle;
+  animation:badgePop 2s ease-in-out infinite;
+}
+@keyframes badgePop { 0%,100%{opacity:.7} 50%{opacity:1;box-shadow:0 0 6px rgba(245,166,35,.4)} }
+
+/* PREVIEW CARD */
+#pcard {
+  display:none; margin-top:.5rem;
+  border:1px solid var(--border2); border-radius:20px;
+  background:linear-gradient(135deg,rgba(10,10,20,.95),rgba(16,10,28,.95));
+  padding:2rem; position:relative; overflow:hidden;
+  animation:popIn .45s cubic-bezier(.22,1,.36,1);
+  backdrop-filter:blur(10px);
+}
+#pcard::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent2) 35%,var(--pink) 65%,transparent);
+  animation:scanLine 3s ease-in-out infinite alternate;
+}
+@keyframes scanLine {
+  0%   { background-position:-100% 0; opacity:.4; }
+  100% { background-position:200% 0; opacity:1; }
+}
+#pcard::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 85% 15%,rgba(155,109,255,.06),transparent);
+}
+
+.ptitle {
+  font-family:var(--f); font-size:1.5rem; font-weight:800;
+  background:linear-gradient(120deg,var(--accent2),var(--text));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.ploc { font-family:var(--m); font-size:11px; color:var(--muted); margin-top:.3rem; letter-spacing:.06em; }
+
+.plinks { display:flex; gap:.65rem; flex-wrap:wrap; margin:1.3rem 0; }
+.plink {
+  font-family:var(--m); font-size:12px; padding:.5rem 1rem;
+  border:1px solid var(--border2); border-radius:8px;
+  color:var(--muted); text-decoration:none; cursor:none;
+  transition:all .25s; letter-spacing:.04em; position:relative; overflow:hidden;
+}
+.plink::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(155,109,255,.08),transparent);
+  transform:translateX(-100%); transition:transform .35s;
+}
+.plink:hover { color:var(--accent2); border-color:var(--accent); }
+.plink:hover::before { transform:translateX(100%); }
+.plink.locked { opacity:.35; pointer-events:none; }
+
+/* THRESHOLDS */
+.thr-row { display:flex; gap:.6rem; margin-bottom:1.5rem; }
+.thr {
+  flex:1; border-radius:10px; padding:.7rem;
+  text-align:center; font-family:var(--m); font-size:11px;
+  position:relative; overflow:hidden; transition:transform .25s;
+}
+.thr:hover { transform:translateY(-2px); }
+.thr.aur    { background:rgba(245,166,35,.09); border:1px solid rgba(245,166,35,.25); color:var(--gold); }
+.thr.argint { background:rgba(157,174,192,.09); border:1px solid rgba(157,174,192,.25); color:var(--silver); }
+.thr.bronz  { background:rgba(196,130,74,.09); border:1px solid rgba(196,130,74,.25); color:var(--bronze); }
+.thr-l { font-size:9px; letter-spacing:.16em; opacity:.75; }
+.thr-v { font-size:16px; font-weight:700; margin-top:3px; }
+
+/* TIMER OPT */
+.topt {
+  display:flex; align-items:center; gap:.75rem;
+  padding:.9rem 1.2rem; border:1px solid var(--border);
+  border-radius:10px; background:rgba(155,109,255,.04);
+  margin-bottom:1.5rem; transition:border-color .3s;
+}
+.topt:hover { border-color:var(--border2); }
+.topt-lbl { font-family:var(--m); font-size:12px; color:var(--muted); }
+.tog {
+  width:38px; height:21px; border-radius:11px;
+  background:var(--border2); cursor:none; position:relative;
+  transition:background .3s; flex-shrink:0;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.4);
+}
+.tog.on { background:var(--accent); box-shadow:0 0 10px rgba(155,109,255,.4),inset 0 1px 3px rgba(0,0,0,.2); }
+.tog::after {
+  content:''; position:absolute; left:3px; top:3px;
+  width:15px; height:15px; border-radius:50%; background:#fff;
+  transition:transform .3s cubic-bezier(.22,1,.36,1); box-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.tog.on::after { transform:translateX(17px); }
+
+.start-wrap { display:flex; justify-content:flex-end; }
+
+/* ════ STEP 2: EXAM ════ */
+#s2 { display:none; position:relative; z-index:2; }
+
+.exam-grid {
+  display:grid; grid-template-columns:1fr 310px; gap:0;
+  min-height:calc(100vh - 58px - 52px);
+}
+.emain { padding:2.5rem; border-right:1px solid var(--border); }
+.emeta { font-family:var(--m); font-size:11px; color:var(--muted); letter-spacing:.08em; margin-bottom:.4rem; }
+.etitle { font-family:var(--f); font-size:1.6rem; font-weight:800; color:var(--accent2); }
+.ehdr { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:2rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+
+.pdf-wrap {
+  border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  background:var(--bg2); transition:box-shadow .4s;
+  box-shadow:0 0 40px rgba(0,0,0,.5);
+}
+.pdf-wrap:hover { box-shadow:0 0 60px rgba(0,0,0,.6),0 0 30px rgba(155,109,255,.06); }
+.pdf-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.6rem 1rem; background:rgba(10,10,20,.8); border-bottom:1px solid var(--border);
+}
+.pdf-nm { font-family:var(--m); font-size:11px; color:var(--muted); }
+#pv { width:100%; height:68vh; border:none; display:block; }
+.pdf-fallback {
+  height:260px; display:none; flex-direction:column;
+  align-items:center; justify-content:center; gap:1rem;
+  padding:2rem; text-align:center;
+}
+
+/* SIDEBAR */
+.esidebar {
+  padding:1.5rem; position:sticky; top:110px;
+  height:calc(100vh - 110px); overflow-y:auto;
+  display:flex; flex-direction:column; gap:1.1rem;
+}
+.slbl { font-family:var(--m); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:.7rem; }
+
+/* PROB SCORERS */
+.pscorer {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:12px; padding:.9rem; transition:all .3s;
+  position:relative; overflow:hidden;
+}
+.pscorer::before {
+  content:''; position:absolute; top:0; left:0;
+  width:3px; height:0; border-radius:0 2px 2px 0;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  transition:height .4s cubic-bezier(.22,1,.36,1);
+}
+.pscorer:focus-within { border-color:var(--border2); box-shadow:0 0 18px var(--glow); }
+.pscorer:focus-within::before { height:100%; }
+.ph { display:flex; align-items:center; justify-content:space-between; margin-bottom:.55rem; }
+.pn { font-family:var(--m); font-size:10px; letter-spacing:.12em; color:var(--muted); }
+.pd { font-family:var(--m); font-size:14px; font-weight:700; color:var(--accent2); transition:all .25s; }
+.pscorer:focus-within .pd { text-shadow:0 0 8px rgba(196,165,255,.5); }
+
+.pslider {
+  width:100%; height:4px; appearance:none;
+  background:var(--border2); border-radius:99px; outline:none; cursor:none; margin-bottom:.5rem;
+}
+.pslider::-webkit-slider-thumb {
+  appearance:none; width:16px; height:16px; border-radius:50%;
+  background:radial-gradient(circle,var(--accent2),var(--accent));
+  cursor:none; box-shadow:0 0 10px rgba(155,109,255,.65);
+  transition:transform .15s, box-shadow .15s;
+}
+.pslider::-webkit-slider-thumb:hover { transform:scale(1.3); box-shadow:0 0 16px rgba(155,109,255,1); }
+
+.sdots { display:flex; gap:2px; margin-top:4px; }
+.sd {
+  flex:1; height:4px; border-radius:2px;
+  background:var(--border2); cursor:none; transition:all .15s;
+}
+.sd:hover { background:var(--accent2); transform:scaleY(2); }
+.sd.on { background:linear-gradient(90deg,var(--accent),var(--accent2)); box-shadow:0 0 4px rgba(155,109,255,.45); }
+
+/* TOTAL CARD */
+.totcard {
+  background:linear-gradient(135deg,rgba(155,109,255,.11),rgba(109,40,217,.05));
+  border:1px solid var(--border2); border-radius:14px;
+  padding:1.3rem; text-align:center; position:relative; overflow:hidden;
+}
+.totcard::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent2),var(--pink),transparent);
+  animation:scanLine 3s ease-in-out infinite alternate;
+}
+.totcard::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(155,109,255,.09),transparent);
+}
+.totnum {
+  font-family:var(--f); font-size:3.2rem; font-weight:900;
+  background:linear-gradient(135deg,#fff,var(--accent2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter:drop-shadow(0 0 14px rgba(155,109,255,.3));
+  line-height:1; position:relative; z-index:1; transition:all .3s;
+}
+.totnum.bump { animation:numBump .3s cubic-bezier(.22,1,.36,1); }
+@keyframes numBump { 0%{transform:scale(1.18)} 100%{transform:scale(1)} }
+.totlbl { font-family:var(--m); font-size:10px; color:var(--muted); letter-spacing:.12em; margin-top:.3rem; }
+
+/* MEDAL PREVIEW */
+.mpreview {
+  border-radius:12px; padding:.9rem 1rem;
+  border:1px solid var(--border); background:var(--bg2);
+  display:flex; align-items:center; gap:.8rem;
+  transition:all .5s cubic-bezier(.22,1,.36,1);
+}
+.mpreview.AUR    { border-color:rgba(245,166,35,.5); background:rgba(245,166,35,.06); box-shadow:0 0 22px rgba(245,166,35,.16); }
+.mpreview.ARGINT { border-color:rgba(157,174,192,.5); background:rgba(157,174,192,.05); box-shadow:0 0 18px rgba(157,174,192,.12); }
+.mpreview.BRONZ  { border-color:rgba(196,130,74,.5);  background:rgba(196,130,74,.05);  box-shadow:0 0 18px rgba(196,130,74,.12); }
+.mpreview.AUR .micon { animation:mWiggle 2s ease-in-out infinite; }
+@keyframes mWiggle { 0%,100%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)} }
+.micon { font-size:1.6rem; flex-shrink:0; transition:transform .4s cubic-bezier(.22,1,.36,1); }
+.mname { font-family:var(--m); font-size:12px; font-weight:600; color:var(--text); }
+.mrank { font-family:var(--m); font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* ════ STEP 3: RESULTS ════ */
+#s3 { display:none; position:relative; z-index:2; }
+
+.rwrap { max-width:1100px; margin:0 auto; padding:4rem 2rem 4rem; }
+
+.rhero {
+  text-align:center; margin-bottom:3rem;
+  animation:heroIn 1s cubic-bezier(.22,1,.36,1);
+}
+@keyframes heroIn { from{opacity:0;transform:translateY(40px) scale(.85)} to{opacity:1;transform:none} }
+
+.rmedal {
+  font-size:7rem; display:block; line-height:1; margin-bottom:1rem;
+  animation:floatSpin 4s ease-in-out infinite;
+}
+@keyframes floatSpin {
+  0%,100% { transform:translateY(0) rotate(-4deg); }
+  50%      { transform:translateY(-14px) rotate(4deg); }
+}
+.rscore {
+  font-family:var(--f); font-size:6rem; font-weight:900; display:block;
+  background:linear-gradient(135deg,#fff 0%,var(--accent2) 50%,var(--pink) 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter:drop-shadow(0 0 24px rgba(155,109,255,.35));
+  animation:gradSwirl 5s ease infinite;
+}
+.rsub { font-family:var(--m); font-size:13px; color:var(--muted); letter-spacing:.08em; margin-top:.5rem; }
+.rpremiu {
+  font-family:var(--m); font-size:14px; color:var(--gold); margin-top:.7rem;
+  letter-spacing:.06em;
+  animation:goldGlow 2.5s ease-in-out infinite alternate;
+}
+@keyframes goldGlow { 0%{text-shadow:0 0 6px rgba(245,166,35,.3)} 100%{text-shadow:0 0 24px rgba(245,166,35,.8)} }
+
+/* TWO-COL RESULTS LAYOUT */
+.r2col { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+.r1col { margin-bottom:1.2rem; }
+
+.rsec {
+  background:linear-gradient(135deg,var(--bg2),rgba(10,10,20,.85));
+  border:1px solid var(--border); border-radius:18px;
+  padding:1.8rem; position:relative; overflow:hidden;
+  opacity:0;
+  animation:secReveal .6s cubic-bezier(.22,1,.36,1) var(--dl,.1s) forwards;
+  transition:border-color .3s, box-shadow .3s;
+}
+.rsec:hover { border-color:var(--border2); box-shadow:0 0 30px rgba(155,109,255,.07); }
+@keyframes secReveal { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+.rsec::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),transparent);
+}
+.rsec::after {
+  content:''; position:absolute; top:0; right:0; bottom:0; width:1px;
+  background:linear-gradient(180deg,var(--accent),transparent 40%);
+  opacity:0; transition:opacity .3s;
+}
+.rsec:hover::after { opacity:.5; }
+
+.rsec-t {
+  font-family:var(--m); font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:1.4rem;
+  display:flex; align-items:center; gap:.6rem;
+}
+.rsec-t::before { content:''; width:18px; height:1px; background:var(--accent); }
+.rsec-t::after  { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+/* BREAKDOWN BARS */
+.rb { display:flex; align-items:center; gap:.9rem; margin-bottom:.9rem; }
+.rbl { font-family:var(--m); font-size:11px; color:var(--muted); letter-spacing:.05em; width:78px; flex-shrink:0; }
+.rbw { flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden; position:relative; }
+.rbb {
+  height:100%;
+  background:linear-gradient(90deg,#6d28d9,var(--accent),var(--accent2));
+  box-shadow:0 0 10px rgba(155,109,255,.65);
+  border-radius:99px; transition:width 1.1s cubic-bezier(.22,1,.36,1);
+  position:relative;
+}
+.rbb::after { content:''; position:absolute; top:0; right:0; width:4px; height:100%; background:rgba(255,255,255,.7); border-radius:99px; box-shadow:0 0 6px #fff; }
+.rbs { font-family:var(--m); font-size:14px; font-weight:700; color:var(--accent2); width:26px; text-align:right; flex-shrink:0; }
+.rbm { font-family:var(--m); font-size:11px; color:var(--muted); flex-shrink:0; }
+.rdiv { border:none; border-top:1px solid var(--border); margin:1rem 0; }
+.rtot { display:flex; justify-content:space-between; align-items:center; }
+.rtot-l { font-family:var(--m); font-size:12px; color:var(--muted); }
+.rtot-v { font-family:var(--f); font-size:1.6rem; font-weight:900; color:var(--accent2); filter:drop-shadow(0 0 8px rgba(155,109,255,.4)); }
+
+/* BAREM */
+.barem-ok {
+  display:flex; align-items:center; gap:.75rem;
+  background:rgba(34,211,162,.07); border:1px solid rgba(34,211,162,.22);
+  border-radius:10px; padding:.9rem; margin-bottom:1rem;
+  animation:popIn .4s cubic-bezier(.22,1,.36,1);
+}
+.barem-ok-ic { font-size:1.2rem; }
+.barem-ok-tx { font-family:var(--m); font-size:11px; color:var(--green); }
+.bvw { border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+#bvw { width:100%; height:460px; border:none; display:block; }
+
+/* ── SCORING + LIVE RESULT side by side ── */
+.score-live-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:start;
+}
+
+/* MANUAL INPUTS */
+.ms-inputs { display:flex; flex-direction:column; gap:.75rem; }
+.ms-row { display:flex; align-items:center; gap:.9rem; }
+.ms-lbl { font-family:var(--m); font-size:11px; color:var(--muted); width:78px; flex-shrink:0; }
+.ms-in {
+  width:72px; padding:.42rem .65rem;
+  font-family:var(--m); font-size:14px; font-weight:700;
+  background:rgba(14,14,24,.9); border:1px solid var(--border2);
+  border-radius:8px; color:var(--accent2); outline:none;
+  transition:border-color .3s, box-shadow .3s; cursor:none;
+}
+.ms-in:focus { border-color:var(--accent); box-shadow:0 0 14px rgba(155,109,255,.28); }
+.ms-mx { font-family:var(--m); font-size:11px; color:var(--muted); }
+.ms-tot {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 1rem; border-radius:10px; margin-top:.4rem;
+  background:rgba(155,109,255,.08); border:1px solid var(--border2);
+}
+.ms-tot-l { font-family:var(--m); font-size:12px; color:var(--muted); }
+.ms-tot-v { font-family:var(--f); font-size:1.4rem; font-weight:900; color:var(--accent2); }
+
+/* LIVE RESULT BOX */
+.live-result {
+  border:1px solid var(--border2); border-radius:16px;
+  padding:1.5rem; text-align:center; position:relative; overflow:hidden;
+  background:linear-gradient(135deg,rgba(155,109,255,.09),rgba(109,40,217,.04));
+  transition:all .4s cubic-bezier(.22,1,.36,1);
+}
+.live-result::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent2),transparent);
+  animation:scanLine 3s ease-in-out infinite alternate;
+}
+.live-result.gold-glow { border-color:rgba(245,166,35,.5); box-shadow:0 0 30px rgba(245,166,35,.18); }
+.live-result.silver-glow { border-color:rgba(157,174,192,.5); box-shadow:0 0 20px rgba(157,174,192,.12); }
+.live-result.bronze-glow { border-color:rgba(196,130,74,.5); box-shadow:0 0 20px rgba(196,130,74,.12); }
+
+.lr-medal { font-size:3.5rem; display:block; animation:floatSpin 4s ease-in-out infinite; line-height:1; margin-bottom:.5rem; }
+.lr-score { font-family:var(--f); font-size:2.6rem; font-weight:900; color:var(--accent2); line-height:1; }
+.lr-of    { font-family:var(--m); font-size:10px; color:var(--muted); margin-top:.2rem; }
+.lr-premiu { font-family:var(--m); font-size:12px; color:var(--gold); margin-top:.5rem; letter-spacing:.05em; animation:goldGlow 2.5s ease-in-out infinite alternate; }
+.lr-rank  { font-family:var(--m); font-size:11px; color:var(--muted); margin-top:.3rem; }
+
+/* ── MINI RANK TABLE ── */
+.mini-rank { margin-top:1.2rem; text-align:left; }
+.mr-hd { font-family:var(--m); font-size:9px; letter-spacing:.2em; color:var(--muted); margin-bottom:.5rem; text-transform:uppercase; }
+.mr-row {
+  display:flex; align-items:center; gap:.8rem;
+  padding:.45rem .7rem; border-radius:7px; transition:background .15s;
+}
+.mr-row:hover { background:rgba(155,109,255,.05); }
+.mr-row.you { background:rgba(155,109,255,.11); border:1px solid rgba(155,109,255,.22); margin:3px 0; animation:youPulse 2.5s ease-in-out infinite; }
+@keyframes youPulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 12px rgba(155,109,255,.18)} }
+.mr-rk { font-family:var(--m); font-size:10px; color:var(--muted); width:22px; flex-shrink:0; }
+.mr-nm { flex:1; font-size:12px; color:var(--text); }
+.mr-nm.you { color:var(--accent2); font-weight:700; }
+.mr-sc { font-family:var(--m); font-size:12px; font-weight:700; color:var(--accent2); flex-shrink:0; }
+.mbadge { font-family:var(--m); font-size:8px; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.mbadge.AUR    { background:rgba(245,166,35,.12); color:var(--gold);   border:1px solid rgba(245,166,35,.28); }
+.mbadge.ARGINT { background:rgba(157,174,192,.1); color:var(--silver); border:1px solid rgba(157,174,192,.26); }
+.mbadge.BRONZ  { background:rgba(196,130,74,.1);  color:var(--bronze); border:1px solid rgba(196,130,74,.26); }
+
+/* FULL RANKING */
+.rk-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+.rk-yr  { font-family:var(--m); font-size:11px; color:var(--muted); }
+.rk-pos {
+  font-family:var(--m); font-size:11px; padding:.3rem .8rem;
+  border-radius:99px; background:rgba(155,109,255,.12);
+  border:1px solid var(--border2); color:var(--accent2);
+  animation:badgePop 3s ease-in-out infinite;
+}
+.rt-row {
+  display:flex; align-items:center; gap:.9rem;
+  padding:.55rem .8rem; border-radius:8px; transition:background .2s;
+}
+.rt-row:hover { background:rgba(155,109,255,.05); }
+.rt-row.you {
+  background:rgba(155,109,255,.1); border:1px solid rgba(155,109,255,.24);
+  margin:3px 0; animation:youPulse 2.5s ease-in-out infinite;
+}
+.rt-rk { font-family:var(--m); font-size:11px; color:var(--muted); width:26px; flex-shrink:0; }
+.rt-nm { flex:1; font-size:13px; color:var(--text); }
+.rt-nm.you { color:var(--accent2); font-weight:700; }
+.rt-sc { font-family:var(--m); font-size:13px; font-weight:700; color:var(--accent2); flex-shrink:0; }
+
+/* RESTART */
+.rr-wrap { text-align:center; margin-top:3rem; }
+.rrbtn {
+  font-family:var(--m); font-size:13px; font-weight:600; letter-spacing:.06em;
+  padding:.8rem 2.4rem; border-radius:10px;
+  border:1px solid var(--border2); background:transparent;
+  color:var(--accent2); cursor:none; transition:all .3s; position:relative; overflow:hidden;
+}
+.rrbtn:hover { background:var(--glow); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 0 20px var(--glow2); }
+
+/* ════ MODAL ════ */
+.modal-ov {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,.78); backdrop-filter:blur(14px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.modal-ov.open { opacity:1; pointer-events:all; }
+.modal {
+  background:linear-gradient(135deg,var(--bg2),rgba(12,8,24,.98));
+  border:1px solid var(--border2); border-radius:22px; padding:2.5rem;
+  max-width:420px; width:90%;
+  transform:scale(.88) translateY(24px);
+  transition:transform .4s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden;
+}
+.modal-ov.open .modal { transform:scale(1) translateY(0); }
+.modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent2),var(--pink),transparent);
+}
+.modal-ic { font-size:2.8rem; text-align:center; margin-bottom:1rem; display:block; animation:floatSpin 4s ease-in-out infinite; }
+.modal-ti { font-family:var(--f); font-size:1.6rem; font-weight:800; text-align:center; margin-bottom:.5rem; }
+.modal-bd { font-size:14px; color:var(--muted); text-align:center; line-height:1.7; margin-bottom:2rem; }
+.modal-bts { display:flex; gap:.75rem; }
+.modal-bts .btn { flex:1; padding:.7rem; text-align:center; }
+
+/* PAGE TRANSITION */
+.ptrans { position:fixed; inset:0; z-index:500; pointer-events:none;
+  background:linear-gradient(135deg,#5b21b6,var(--accent),var(--pink));
+  transform:translateX(-100%); }
+.ptrans.in { animation:ptIn .45s cubic-bezier(.22,1,.36,1) forwards; }
+.ptrans.out { animation:ptOut .45s cubic-bezier(.22,1,.36,1) .06s forwards; }
+@keyframes ptIn  { to{transform:translateX(0)} }
+@keyframes ptOut { from{transform:translateX(0)} to{transform:translateX(100%)} }
+
+/* CONFETTI */
+.conf { position:fixed; pointer-events:none; z-index:2000; animation:confFall var(--d,3s) ease-in var(--dl,0s) forwards; }
+@keyframes confFall { 0%{transform:translateY(-30px) translateX(0) rotate(0);opacity:1} 100%{transform:translateY(110vh) translateX(var(--dx,0px)) rotate(800deg);opacity:0} }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(155,109,255,.22); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- AURORA -->
+<canvas id="aurora"></canvas>
+
+<!-- GRID + ORBS -->
+<div class="grid"></div>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+
+<!-- PAGE TRANSITION -->
+<div class="ptrans" id="pt"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="gem">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <polygon points="10,2 18,8 15,17 5,17 2,8" fill="none" stroke="url(#g1)" stroke-width="1.3"/>
+        <polygon points="10,2 18,8 10,6" fill="rgba(155,109,255,.3)"/>
+        <polygon points="10,2 2,8 10,6"  fill="rgba(196,165,255,.2)"/>
+        <polygon points="10,6 18,8 15,17 5,17 2,8" fill="rgba(155,109,255,.07)"/>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="20" y2="20">
+            <stop offset="0%"   stop-color="#c4a5ff"/>
+            <stop offset="100%" stop-color="#6d28d9"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    ONM · Simulare
+  </a>
+  <a class="nav-back" href="index.html">← înapoi</a>
+</nav>
+
+<!-- TIMER BAR -->
+<div id="tbar" class="hidden">
+  <div class="tdisp" id="tdisp">4:00:00</div>
+  <div class="tbar-mid">
+    <div class="tprog"><div class="tfill" id="tfill" style="width:100%"></div></div>
+  </div>
+  <div style="display:flex;gap:.5rem;">
+    <button class="btn" id="tbtn" onclick="toggleTimer()">⏸ Pauză</button>
+    <button class="btn" onclick="openModal()">Finish →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ STEP 1 ══════════════════════ -->
+<div id="s1">
+  <div class="eyebrow">Simulare oficială ONM</div>
+  <h1 class="hero-title">
+    <span class="ht-main">2010 – 2026</span>
+    <span class="ht-sub">Olimpiada Națională de Matematică</span>
+  </h1>
+
+  <div class="sel-sec" style="--dl:.38s">
+    <div class="sec-label">Clasa</div>
+    <div class="pills" id="cpills">
+      <div class="pill" onclick="pickCls('IX',this)">a IX-a</div>
+      <div class="pill" onclick="pickCls('X',this)">a X-a</div>
+      <div class="pill" onclick="pickCls('XI',this)">a XI-a</div>
+      <div class="pill" onclick="pickCls('XII',this)">a XII-a</div>
+    </div>
+  </div>
+
+  <div class="sel-sec" style="--dl:.52s">
+    <div class="sec-label">Anul</div>
+    <div class="pills" id="ypills">
+      <div class="pill" onclick="pickYr('2026',this)">2026 <span class="badge">NOU</span></div>
+      <div class="pill" onclick="pickYr('2025',this)">2025 <span class="badge">NOU</span></div>
+      <div class="pill" onclick="pickYr('2024',this)">2024</div>
+      <div class="pill" onclick="pickYr('2023',this)">2023</div>
+      <div class="pill" onclick="pickYr('2022',this)">2022</div>
+      <div class="pill" onclick="pickYr('2019',this)">2019</div>
+      <div class="pill" onclick="pickYr('2018',this)">2018</div>
+      <div class="pill" onclick="pickYr('2017',this)">2017</div>
+      <div class="pill" onclick="pickYr('2016',this)">2016</div>
+      <div class="pill" onclick="pickYr('2014',this)">2014</div>
+      <div class="pill" onclick="pickYr('2013',this)">2013</div>
+      <div class="pill" onclick="pickYr('2012',this)">2012</div>
+      <div class="pill" onclick="pickYr('2011',this)">2011</div>
+      <div class="pill" onclick="pickYr('2010',this)">2010</div>
+    </div>
+  </div>
+
+  <div id="pcard">
+    <div class="ptitle" id="pc-title">—</div>
+    <div class="ploc"   id="pc-loc">—</div>
+    <div class="plinks" id="pc-links"></div>
+    <div class="thr-row" id="pc-thr"></div>
+    <div class="topt">
+      <div class="tog on" id="tog" onclick="toggleTimerOpt()"></div>
+      <span class="topt-lbl" id="toptlbl">Timer 4h activ</span>
+    </div>
+    <div class="start-wrap">
+      <button class="bigbtn" onclick="startExam()">Începe simularea →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STEP 2 ══════════════════════ -->
+<div id="s2">
+  <div class="exam-grid">
+    <div class="emain">
+      <div class="ehdr">
+        <div>
+          <div class="emeta" id="emeta">—</div>
+          <div class="etitle">Subiecte</div>
+        </div>
+        <a class="btn" id="pdflink" href="#" target="_blank">↗ PDF</a>
+      </div>
+      <div class="pdf-wrap">
+        <div class="pdf-bar">
+          <span class="pdf-nm" id="pdfnm">—</span>
+          <a class="btn" id="pdflink2" href="#" target="_blank" style="font-size:11px">Deschide ↗</a>
+        </div>
+        <iframe id="pv" src="" loading="lazy"></iframe>
+        <div class="pdf-fallback" id="pdffall">
+          <div style="font-size:2.5rem;opacity:.35">📄</div>
+          <p style="color:var(--muted);font-family:var(--m);font-size:13px">PDF-ul nu poate fi afișat direct.</p>
+          <a class="btn" id="pdffall2" href="#" target="_blank" style="margin-top:.5rem">Deschide în tab ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="esidebar">
+      <div>
+        <div class="slbl">Notare rapidă</div>
+        <div id="scorers"></div>
+      </div>
+      <div class="totcard">
+        <div class="totnum" id="livetot">0</div>
+        <div class="totlbl" id="livelbl">PUNCTE / 28</div>
+      </div>
+      <div class="mpreview" id="mprev">
+        <div class="micon" id="micon">—</div>
+        <div>
+          <div class="mname" id="mname">Completează subiectele</div>
+          <div class="mrank" id="mrank"></div>
+        </div>
+      </div>
+      <div style="margin-top:auto">
+        <button class="btn danger" onclick="openModal()" style="width:100%">Finish și barem →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STEP 3 ══════════════════════ -->
+<div id="s3">
+  <div class="rwrap">
+    <div class="rhero">
+      <span class="rmedal" id="rmedal">—</span>
+      <span class="rscore" id="rscore">0</span>
+      <div class="rsub" id="rsub">puncte</div>
+      <div class="rpremiu" id="rpremiu"></div>
+    </div>
+
+    <!-- Row 1: breakdown + barem -->
+    <div class="r2col">
+      <div class="rsec" style="--dl:.1s">
+        <div class="rsec-t">Punctaj estimat (din slider)</div>
+        <div id="rrows"></div>
+        <hr class="rdiv">
+        <div class="rtot">
+          <span class="rtot-l">Total slider</span>
+          <span class="rtot-v" id="rtotv">0</span>
+        </div>
+      </div>
+
+      <div class="rsec" style="--dl:.2s">
+        <div class="rsec-t">Barem — acum deblocat 🔓</div>
+        <div class="barem-ok">
+          <div class="barem-ok-ic">🔓</div>
+          <div class="barem-ok-tx">Verifică soluțiile și introdu punctajele reale mai jos</div>
+        </div>
+        <div class="bvw"><iframe id="bvw" src=""></iframe></div>
+        <div style="text-align:right;margin-top:.7rem">
+          <a class="btn" id="baremlink" href="#" target="_blank">↗ Deschide barem complet</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: NOTARE MANUALA + LIVE RESULT side by side -->
+    <div class="rsec r1col" style="--dl:.3s">
+      <div class="rsec-t">Notare după barem → Medalie în timp real</div>
+      <div class="score-live-grid">
+
+        <!-- LEFT: inputs -->
+        <div>
+          <p style="font-family:var(--m);font-size:12px;color:var(--muted);margin-bottom:1.1rem;line-height:1.6">
+            Introdu punctajele reale după ce verifici baremul. Medalia și locul se calculează instant.
+          </p>
+          <div class="ms-inputs" id="ms-inputs"></div>
+        </div>
+
+        <!-- RIGHT: live result -->
+        <div class="live-result" id="lrbox">
+          <span class="lr-medal" id="lr-medal">❓</span>
+          <div class="lr-score" id="lr-score">—</div>
+          <div class="lr-of"   id="lr-of">puncte</div>
+          <div class="lr-premiu" id="lr-premiu">Introdu punctajele →</div>
+          <div class="lr-rank"   id="lr-rank"></div>
+          <div class="mini-rank" id="lr-minitable"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: full ranking -->
+    <div class="rsec r1col" style="--dl:.4s">
+      <div class="rsec-t">Clasament oficial complet</div>
+      <div class="rk-hdr">
+        <span class="rk-yr"  id="rk-yr">—</span>
+        <span class="rk-pos" id="rk-pos">—</span>
+      </div>
+      <div id="rktable"></div>
+    </div>
+
+    <div class="rr-wrap">
+      <button class="rrbtn" onclick="resetAll()">↺ Simulare nouă</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <span class="modal-ic">⏱</span>
+    <div class="modal-ti">Termini simularea?</div>
+    <div class="modal-bd">Odată ce dai Finish, baremul devine vizibil. Nu mai poți edita notele din sidebar.</div>
+    <div class="modal-bts">
+      <button class="btn" onclick="closeModal()">← Înapoi</button>
+      <button class="bigbtn" onclick="finishExam()" style="flex:1;padding:.65rem;font-size:13px">Finish →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ──── CURSOR ──── */
+const cur=document.getElementById('cur'), cur2=document.getElementById('cur2');
+let mx=-200,my=-200,rx=-200,ry=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function loop(){
+  cur.style.cssText=`left:${mx}px;top:${my}px`;
+  rx+=(mx-rx)*.11; ry+=(my-ry)*.11;
+  cur2.style.cssText=`left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(loop);
+})();
+
+/* ──── AURORA ──── */
+(()=>{
+  const cv=document.getElementById('aurora'),ctx=cv.getContext('2d');
+  let W,H; const resize=()=>{W=cv.width=window.innerWidth;H=cv.height=window.innerHeight};
+  resize(); window.addEventListener('resize',resize);
+  const ws=[
+    {c:[80,40,210], s:.0005, a:.17, p:0,   y:.38},
+    {c:[60,20,170], s:.00035,a:.13, p:2.1, y:.58},
+    {c:[170,70,255],s:.0007, a:.09, p:4.3, y:.22},
+    {c:[220,80,240],s:.00045,a:.08, p:1.5, y:.72},
+  ];
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    ws.forEach(w=>{
+      w.p+=w.s;
+      const g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,`rgba(${w.c},0)`);
+      g.addColorStop(.5,`rgba(${w.c},.055)`);
+      g.addColorStop(1,`rgba(${w.c},0)`);
+      ctx.beginPath(); ctx.moveTo(0,H);
+      for(let x=0;x<=W;x+=3){
+        const y=H*w.y + Math.sin(x*.005+w.p)*H*w.a + Math.cos(x*.0025+w.p*.8)*H*w.a*.5;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H); ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  })();
+})();
+
+/* ──── PARTICLES ──── */
+(()=>{
+  const cols=['rgba(155,109,255,','rgba(196,165,255,','rgba(109,40,217,','rgba(232,121,249,'];
+  for(let i=0;i<30;i++){
+    const p=document.createElement('div'); p.className='px';
+    const s=1.5+Math.random()*4, op=.15+Math.random()*.35;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*4)]}${op});--d:${8+Math.random()*14}s;--dl:${Math.random()*12}s;--dx:${(Math.random()-.5)*120}px;--op:${op}`;
+    document.body.appendChild(p);
+  }
+})();
+
+/* ──── PAGE TRANSITION ──── */
+function trans(cb){
+  const el=document.getElementById('pt');
+  el.classList.add('in');
+  el.addEventListener('animationend',function h(){
+    el.removeEventListener('animationend',h);
+    cb();
+    el.classList.remove('in'); el.classList.add('out');
+    el.addEventListener('animationend',function h2(){
+      el.removeEventListener('animationend',h2); el.classList.remove('out');
+    });
+  });
+}
+
+/* ──── DATA ──── */
+const DB={
+  '2026':{ loc:'Alba Iulia, 30 martie – 3 aprilie 2026', maxScore:100,
+    sub:{ IX:'https://ssmr.ro/files/onm2026/faza_nationala/09_subiecte_ONM_2026.pdf', X:'https://ssmr.ro/files/onm2026/faza_nationala/10_subiecte_ONM_2026.pdf', XI:'https://ssmr.ro/files/onm2026/faza_nationala/11_subiecte_ONM_2026.pdf', XII:'https://ssmr.ro/files/onm2026/faza_nationala/12_subiecte_ONM_2026.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2026/faza_nationala/09_solutii_bareme_ONM_2026.pdf', X:'https://ssmr.ro/files/onm2026/faza_nationala/10_solutii_bareme_ONM_2026.pdf', XI:'https://ssmr.ro/files/onm2026/faza_nationala/11_solutii_bareme_ONM_2026.pdf', XII:'https://ssmr.ro/files/onm2026/faza_nationala/12_solutii_bareme_ONM_2026.pdf' }
+  },
+  '2025':{ loc:'Botoșani, 2025', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2025/faza_nationala/09_subiecte_ONM_2025.pdf', X:'https://ssmr.ro/files/onm2025/faza_nationala/10_subiecte_ONM_2025.pdf', XI:'https://ssmr.ro/files/onm2025/faza_nationala/11_subiecte_ONM_2025.pdf', XII:'https://ssmr.ro/files/onm2025/faza_nationala/12_subiecte_ONM_2025.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2025/faza_nationala/09_solutii_bareme_ONM_2025.pdf', X:'https://ssmr.ro/files/onm2025/faza_nationala/10_solutii_bareme_ONM_2025.pdf', XI:'https://ssmr.ro/files/onm2025/faza_nationala/11_solutii_bareme_ONM_2025.pdf', XII:'https://ssmr.ro/files/onm2025/faza_nationala/12_solutii_bareme_ONM_2025.pdf' }
+  },
+  '2024':{ loc:'Târgu Mureș, 2024', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2024/faza_nationala/09_solutii_bareme_ONM_2024.pdf', X:'https://ssmr.ro/files/onm2024/faza_nationala/10_solutii_bareme_ONM_2024.pdf', XI:'https://ssmr.ro/files/onm2024/faza_nationala/11_solutii_bareme_ONM_2024.pdf', XII:'https://ssmr.ro/files/onm2024/faza_nationala/12_solutii_bareme_ONM_2024.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2024/faza_nationala/09_solutii_bareme_ONM_2024.pdf', X:'https://ssmr.ro/files/onm2024/faza_nationala/10_solutii_bareme_ONM_2024.pdf', XI:'https://ssmr.ro/files/onm2024/faza_nationala/11_solutii_bareme_ONM_2024.pdf', XII:'https://ssmr.ro/files/onm2024/faza_nationala/12_solutii_bareme_ONM_2024.pdf' }
+  },
+  '2023':{ loc:'Craiova, 2023', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2023/faza_nationala/09_solutii_bareme_ONM_2023.pdf', X:'https://ssmr.ro/files/onm2023/faza_nationala/10_solutii_bareme_ONM_2023.pdf', XI:'https://ssmr.ro/files/onm2023/faza_nationala/11_solutii_bareme_ONM_2023.pdf', XII:'https://ssmr.ro/files/onm2023/faza_nationala/12_solutii_bareme_ONM_2023.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2023/faza_nationala/09_solutii_bareme_ONM_2023.pdf', X:'https://ssmr.ro/files/onm2023/faza_nationala/10_solutii_bareme_ONM_2023.pdf', XI:'https://ssmr.ro/files/onm2023/faza_nationala/11_solutii_bareme_ONM_2023.pdf', XII:'https://ssmr.ro/files/onm2023/faza_nationala/12_solutii_bareme_ONM_2023.pdf' }
+  },
+  '2022':{ loc:'Piatra Neamț, 2022', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2022/faza_nationala/09_solutii_bareme_ONM_2022.pdf', X:'https://ssmr.ro/files/onm2022/faza_nationala/10_solutii_bareme_ONM_2022.pdf', XI:'https://ssmr.ro/files/onm2022/faza_nationala/11_solutii_bareme_ONM_2022.pdf', XII:'https://ssmr.ro/files/onm2022/faza_nationala/12_solutii_bareme_ONM_2022.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2022/faza_nationala/09_solutii_bareme_ONM_2022.pdf', X:'https://ssmr.ro/files/onm2022/faza_nationala/10_solutii_bareme_ONM_2022.pdf', XI:'https://ssmr.ro/files/onm2022/faza_nationala/11_solutii_bareme_ONM_2022.pdf', XII:'https://ssmr.ro/files/onm2022/faza_nationala/12_solutii_bareme_ONM_2022.pdf' }
+  },
+  '2019':{ loc:'Ploiești, 2019', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2019/faza_nationala/09_solutii_bareme_ONM_2019.pdf', X:'https://ssmr.ro/files/onm2019/faza_nationala/10_solutii_bareme_ONM_2019.pdf', XI:'https://ssmr.ro/files/onm2019/faza_nationala/11_solutii_bareme_ONM_2019.pdf', XII:'https://ssmr.ro/files/onm2019/faza_nationala/12_solutii_bareme_ONM_2019.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2019/faza_nationala/09_solutii_bareme_ONM_2019.pdf', X:'https://ssmr.ro/files/onm2019/faza_nationala/10_solutii_bareme_ONM_2019.pdf', XI:'https://ssmr.ro/files/onm2019/faza_nationala/11_solutii_bareme_ONM_2019.pdf', XII:'https://ssmr.ro/files/onm2019/faza_nationala/12_solutii_bareme_ONM_2019.pdf' }
+  },
+  '2018':{ loc:'Satu Mare, 2018', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2018/faza_nationala/09_solutii_bareme_ONM_2018.pdf', X:'https://ssmr.ro/files/onm2018/faza_nationala/10_solutii_bareme_ONM_2018.pdf', XI:'https://ssmr.ro/files/onm2018/faza_nationala/11_solutii_bareme_ONM_2018.pdf', XII:'https://ssmr.ro/files/onm2018/faza_nationala/12_solutii_bareme_ONM_2018.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2018/faza_nationala/09_solutii_bareme_ONM_2018.pdf', X:'https://ssmr.ro/files/onm2018/faza_nationala/10_solutii_bareme_ONM_2018.pdf', XI:'https://ssmr.ro/files/onm2018/faza_nationala/11_solutii_bareme_ONM_2018.pdf', XII:'https://ssmr.ro/files/onm2018/faza_nationala/12_solutii_bareme_ONM_2018.pdf' }
+  },
+  '2017':{ loc:'Iași, 2017', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2017/faza_nationala/09_solutii_bareme_ONM_2017.pdf', X:'https://ssmr.ro/files/onm2017/faza_nationala/10_solutii_bareme_ONM_2017.pdf', XI:'https://ssmr.ro/files/onm2017/faza_nationala/11_solutii_bareme_ONM_2017.pdf', XII:'https://ssmr.ro/files/onm2017/faza_nationala/12_solutii_bareme_ONM_2017.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2017/faza_nationala/09_solutii_bareme_ONM_2017.pdf', X:'https://ssmr.ro/files/onm2017/faza_nationala/10_solutii_bareme_ONM_2017.pdf', XI:'https://ssmr.ro/files/onm2017/faza_nationala/11_solutii_bareme_ONM_2017.pdf', XII:'https://ssmr.ro/files/onm2017/faza_nationala/12_solutii_bareme_ONM_2017.pdf' }
+  },
+  '2016':{ loc:'Brașov, 2016', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2016/faza_nationala/09_solutii_bareme_ONM_2016.pdf', X:'https://ssmr.ro/files/onm2016/faza_nationala/10_solutii_bareme_ONM_2016.pdf', XI:'https://ssmr.ro/files/onm2016/faza_nationala/11_solutii_bareme_ONM_2016.pdf', XII:'https://ssmr.ro/files/onm2016/faza_nationala/12_solutii_bareme_ONM_2016.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2016/faza_nationala/09_solutii_bareme_ONM_2016.pdf', X:'https://ssmr.ro/files/onm2016/faza_nationala/10_solutii_bareme_ONM_2016.pdf', XI:'https://ssmr.ro/files/onm2016/faza_nationala/11_solutii_bareme_ONM_2016.pdf', XII:'https://ssmr.ro/files/onm2016/faza_nationala/12_solutii_bareme_ONM_2016.pdf' }
+  },
+  '2014':{ loc:'Bacău, 2014', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2014/faza_nationala/09_solutii_bareme_ONM_2014.pdf', X:'https://ssmr.ro/files/onm2014/faza_nationala/10_solutii_bareme_ONM_2014.pdf', XI:'https://ssmr.ro/files/onm2014/faza_nationala/11_solutii_bareme_ONM_2014.pdf', XII:'https://ssmr.ro/files/onm2014/faza_nationala/12_solutii_bareme_ONM_2014.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2014/faza_nationala/09_solutii_bareme_ONM_2014.pdf', X:'https://ssmr.ro/files/onm2014/faza_nationala/10_solutii_bareme_ONM_2014.pdf', XI:'https://ssmr.ro/files/onm2014/faza_nationala/11_solutii_bareme_ONM_2014.pdf', XII:'https://ssmr.ro/files/onm2014/faza_nationala/12_solutii_bareme_ONM_2014.pdf' }
+  },
+  '2013':{ loc:'Brașov, 2013', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2013/faza_nationala/09_solutii_bareme_ONM_2013.pdf', X:'https://ssmr.ro/files/onm2013/faza_nationala/10_solutii_bareme_ONM_2013.pdf', XI:'https://ssmr.ro/files/onm2013/faza_nationala/11_solutii_bareme_ONM_2013.pdf', XII:'https://ssmr.ro/files/onm2013/faza_nationala/12_solutii_bareme_ONM_2013.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2013/faza_nationala/09_solutii_bareme_ONM_2013.pdf', X:'https://ssmr.ro/files/onm2013/faza_nationala/10_solutii_bareme_ONM_2013.pdf', XI:'https://ssmr.ro/files/onm2013/faza_nationala/11_solutii_bareme_ONM_2013.pdf', XII:'https://ssmr.ro/files/onm2013/faza_nationala/12_solutii_bareme_ONM_2013.pdf' }
+  },
+  '2012':{ loc:'Focșani, 2012', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2012/faza_nationala/09_solutii_bareme_ONM_2012.pdf', X:'https://ssmr.ro/files/onm2012/faza_nationala/10_solutii_bareme_ONM_2012.pdf', XI:'https://ssmr.ro/files/onm2012/faza_nationala/11_solutii_bareme_ONM_2012.pdf', XII:'https://ssmr.ro/files/onm2012/faza_nationala/12_solutii_bareme_ONM_2012.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2012/faza_nationala/09_solutii_bareme_ONM_2012.pdf', X:'https://ssmr.ro/files/onm2012/faza_nationala/10_solutii_bareme_ONM_2012.pdf', XI:'https://ssmr.ro/files/onm2012/faza_nationala/11_solutii_bareme_ONM_2012.pdf', XII:'https://ssmr.ro/files/onm2012/faza_nationala/12_solutii_bareme_ONM_2012.pdf' }
+  },
+  '2011':{ loc:'Sibiu, 2011', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2011/faza_nationala/09_solutii_bareme_ONM_2011.pdf', X:'https://ssmr.ro/files/onm2011/faza_nationala/10_solutii_bareme_ONM_2011.pdf', XI:'https://ssmr.ro/files/onm2011/faza_nationala/11_solutii_bareme_ONM_2011.pdf', XII:'https://ssmr.ro/files/onm2011/faza_nationala/12_solutii_bareme_ONM_2011.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2011/faza_nationala/09_solutii_bareme_ONM_2011.pdf', X:'https://ssmr.ro/files/onm2011/faza_nationala/10_solutii_bareme_ONM_2011.pdf', XI:'https://ssmr.ro/files/onm2011/faza_nationala/11_solutii_bareme_ONM_2011.pdf', XII:'https://ssmr.ro/files/onm2011/faza_nationala/12_solutii_bareme_ONM_2011.pdf' }
+  },
+  '2010':{ loc:'Curtea de Argeș, 2010', maxScore:28,
+    sub:{ IX:'https://ssmr.ro/files/onm2010/faza_nationala/09_solutii_bareme_ONM_2010.pdf', X:'https://ssmr.ro/files/onm2010/faza_nationala/10_solutii_bareme_ONM_2010.pdf', XI:'https://ssmr.ro/files/onm2010/faza_nationala/11_solutii_bareme_ONM_2010.pdf', XII:'https://ssmr.ro/files/onm2010/faza_nationala/12_solutii_bareme_ONM_2010.pdf' },
+    bar:{ IX:'https://ssmr.ro/files/onm2010/faza_nationala/09_solutii_bareme_ONM_2010.pdf', X:'https://ssmr.ro/files/onm2010/faza_nationala/10_solutii_bareme_ONM_2010.pdf', XI:'https://ssmr.ro/files/onm2010/faza_nationala/11_solutii_bareme_ONM_2010.pdf', XII:'https://ssmr.ro/files/onm2010/faza_nationala/12_solutii_bareme_ONM_2010.pdf' }
+  }
+};
+
+let cls=null, yr=null, timerOn=true, tSecs=14400, tInterval=null, tRunning=false;
+let sliderScores=[0,0,0,0], manScores=[0,0,0,0];
+let ONM={};
+
+/* ──── SELECTION ──── */
+function pickCls(c,el){
+  cls=c;
+  document.querySelectorAll('#cpills .pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel'); showCard();
+}
+function pickYr(y,el){
+  yr=y;
+  document.querySelectorAll('#ypills .pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel'); showCard();
+}
+
+function showCard(){
+  if(!cls||!yr) return;
+  const card=document.getElementById('pcard'); card.style.display='block';
+  const m=DB[yr];
+  document.getElementById('pc-title').textContent=`ONM ${yr} · Clasa a ${cls}-a`;
+  document.getElementById('pc-loc').textContent=m.loc;
+  document.getElementById('pc-links').innerHTML=`
+    <a class="plink" href="${m.sub[cls]}" target="_blank">📄 Subiecte ↗</a>
+    <span class="plink locked" title="Disponibil după Finish">🔒 Barem</span>
+    <a class="plink" href="https://ssmr.ro/onm${yr}" target="_blank">ssmr.ro ↗</a>
+  `;
+  // Thresholds
+  const thr=document.getElementById('pc-thr');
+  if(ONM[yr]?.clase?.[cls]){
+    const el=ONM[yr].clase[cls];
+    const mn=arr=>arr.length?Math.min(...arr.map(e=>e.punctaj||0)):null;
+    const mA=mn(el.filter(e=>e.medalieSSMR==='AUR'));
+    const mAg=mn(el.filter(e=>e.medalieSSMR==='ARGINT'));
+    const mB=mn(el.filter(e=>e.medalieSSMR==='BRONZ'));
+    thr.innerHTML=`
+      ${mA!=null?`<div class="thr aur"><div class="thr-l">AUR ≥</div><div class="thr-v">${mA}</div></div>`:''}
+      ${mAg!=null?`<div class="thr argint"><div class="thr-l">ARGINT ≥</div><div class="thr-v">${mAg}</div></div>`:''}
+      ${mB!=null?`<div class="thr bronz"><div class="thr-l">BRONZ ≥</div><div class="thr-v">${mB}</div></div>`:''}
+    `;
+  } else thr.innerHTML='';
+}
+
+function toggleTimerOpt(){
+  timerOn=!timerOn;
+  document.getElementById('tog').classList.toggle('on',timerOn);
+  document.getElementById('toptlbl').textContent=timerOn?'Timer 4h activ':'Fără timer';
+}
+
+/* ──── START ──── */
+function startExam(){
+  if(!cls||!yr){alert('Alege clasa și anul!');return;}
+  sliderScores=[0,0,0,0]; manScores=[0,0,0,0];
+  trans(()=>{
+    document.getElementById('s1').style.display='none';
+    document.getElementById('s2').style.display='block';
+    const m=DB[yr];
+    document.getElementById('emeta').textContent=`ONM ${yr} · Clasa a ${cls}-a · ${m.loc}`;
+    const url=m.sub[cls];
+    ['pdflink','pdflink2','pdffall2'].forEach(id=>document.getElementById(id).href=url);
+    document.getElementById('pdfnm').textContent=`ONM ${yr} · Clasa ${cls} · Subiecte`;
+    const iv=document.getElementById('pv');
+    iv.src=`https://docs.google.com/gviewer?embedded=true&url=${encodeURIComponent(url)}`;
+    iv.style.display='block'; document.getElementById('pdffall').style.display='none';
+    iv.onerror=()=>{iv.style.display='none';document.getElementById('pdffall').style.display='flex';};
+    const mx=m.maxScore||28;
+    document.getElementById('livelbl').textContent=`PUNCTE / ${mx}`;
+    buildScorers();
+    if(timerOn){ tSecs=14400; tRunning=true; document.getElementById('tbar').classList.remove('hidden'); startTimer(); }
+    updateLive(); window.scrollTo(0,0);
+  });
+}
+
+/* ──── SCORERS ──── */
+function buildScorers(){
+  const c=document.getElementById('scorers'); c.innerHTML='';
+  const mx=DB[yr]?.maxScore===100?25:7;
+  for(let i=0;i<4;i++){
+    const d=document.createElement('div'); d.className='pscorer';
+    const dots=Array.from({length:mx+1},(_,v)=>`<div class="sd" onclick="setScore(${i},${v})" title="${v}pt"></div>`).join('');
+    d.innerHTML=`
+      <div class="ph"><span class="pn">PROB. ${i+1}</span><span class="pd" id="pd${i}">0 / ${mx}</span></div>
+      <input type="range" class="pslider" min="0" max="${mx}" step=".5" value="0" id="ps${i}" oninput="onSlider(${i},this.value)">
+      <div class="sdots" id="sdots${i}">${dots}</div>
+    `;
+    c.appendChild(d);
+    d.style.opacity='0'; d.style.transform='translateX(18px)';
+    setTimeout(()=>{d.style.transition='opacity .4s,transform .4s';d.style.opacity='1';d.style.transform='';},80+i*80);
+  }
+}
+function onSlider(i,v){ v=parseFloat(v); sliderScores[i]=v; const mx=DB[yr]?.maxScore===100?25:7; document.getElementById('pd'+i).textContent=`${v}/${mx}`; updateDots(i,v,mx); updateLive(); }
+function setScore(i,v){ const mx=DB[yr]?.maxScore===100?25:7; sliderScores[i]=v; document.getElementById('ps'+i).value=v; document.getElementById('pd'+i).textContent=`${v}/${mx}`; updateDots(i,v,mx); updateLive(); }
+function updateDots(i,v){ document.querySelectorAll(`#sdots${i} .sd`).forEach((d,x)=>d.classList.toggle('on',x<=v)); }
+
+function updateLive(){
+  const tot=sliderScores.reduce((a,b)=>a+b,0);
+  const el=document.getElementById('livetot');
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+  el.textContent=fmt(tot);
+  if(!ONM[yr]?.clase?.[cls]) return;
+  const {medal,rank,premiu}=getMedal(tot);
+  const mp=document.getElementById('mprev');
+  mp.className='mpreview'; if(medal) mp.classList.add(medal);
+  const ic={AUR:'🥇',ARGINT:'🥈',BRONZ:'🥉'};
+  document.getElementById('micon').textContent=ic[medal]||'—';
+  document.getElementById('mname').textContent=medal?`Medalie de ${medal[0]+medal.slice(1).toLowerCase()}`:'Fără medalie';
+  document.getElementById('mrank').textContent=rank?`Locul ${rank}${premiu?' · '+premiu:''}`:'';
+}
+
+/* ──── TIMER ──── */
+function startTimer(){
+  clearInterval(tInterval); renderTimer();
+  tInterval=setInterval(()=>{ if(!tRunning)return; tSecs--; if(tSecs<=0){tSecs=0;clearInterval(tInterval);openModal();} renderTimer(); },1000);
+}
+function renderTimer(){
+  const h=Math.floor(tSecs/3600),m=Math.floor((tSecs%3600)/60),s=tSecs%60;
+  const str=`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const d=document.getElementById('tdisp'); d.textContent=str;
+  document.getElementById('tfill').style.width=(tSecs/14400*100)+'%';
+  const w=tSecs<1800, cr=tSecs<300;
+  d.className='tdisp'+(cr?' crit':w?' warn':'');
+  document.getElementById('tfill').className='tfill'+(w?' warn':'');
+  const tb=document.getElementById('tbar'); tb.className=w?'warn':''; tb.id='tbar';
+}
+function toggleTimer(){ tRunning=!tRunning; document.getElementById('tbtn').textContent=tRunning?'⏸ Pauză':'▶ Continuă'; }
+
+/* ──── MODAL ──── */
+function openModal(){ tRunning=false; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ tRunning=timerOn; document.getElementById('modal').classList.remove('open'); }
+function finishExam(){
+  document.getElementById('modal').classList.remove('open');
+  clearInterval(tInterval); tRunning=false;
+  trans(()=>{
+    document.getElementById('s2').style.display='none';
+    document.getElementById('tbar').classList.add('hidden');
+    document.getElementById('s3').style.display='block';
+    renderResults(); window.scrollTo(0,0);
+  });
+}
+
+/* ──── MEDAL LOGIC ──── */
+function getMedal(tot){
+  if(!ONM[yr]?.clase?.[cls]) return {medal:null,rank:null,premiu:null};
+  const elevi=[...ONM[yr].clase[cls]].sort((a,b)=>(b.punctaj||0)-(a.punctaj||0));
+  let rank=1; for(const e of elevi){if((e.punctaj||0)>tot) rank++; else break;}
+  const mn=arr=>arr.length?Math.min(...arr.map(e=>e.punctaj||0)):999;
+  const mA=mn(elevi.filter(e=>e.medalieSSMR==='AUR'));
+  const mAg=mn(elevi.filter(e=>e.medalieSSMR==='ARGINT'));
+  const mB=mn(elevi.filter(e=>e.medalieSSMR==='BRONZ'));
+  let medal=null;
+  if(tot>=mA) medal='AUR'; else if(tot>=mAg) medal='ARGINT'; else if(tot>=mB) medal='BRONZ';
+  let premiu=null;
+  if(medal==='AUR'){
+    const au=elevi.filter(e=>e.medalieSSMR==='AUR');
+    const pm={'PREMIUL I':[],'PREMIUL II':[],'PREMIUL III':[]};
+    au.forEach(e=>{if(pm[e.premiu])pm[e.premiu].push(e.punctaj||0);});
+    const p1=pm['PREMIUL I'].length?Math.min(...pm['PREMIUL I']):999;
+    const p2=pm['PREMIUL II'].length?Math.min(...pm['PREMIUL II']):999;
+    const p3=pm['PREMIUL III'].length?Math.min(...pm['PREMIUL III']):999;
+    if(tot>=p1) premiu='Premiul I'; else if(tot>=p2) premiu='Premiul II'; else if(tot>=p3) premiu='Premiul III'; else premiu='Mențiune';
+  }
+  return {medal,rank,premiu};
+}
+
+/* ──── RESULTS ──── */
+function renderResults(){
+  const tot=sliderScores.reduce((a,b)=>a+b,0);
+  const {medal,rank,premiu}=getMedal(tot);
+  const mx=DB[yr]?.maxScore||28;
+  const ic={AUR:'🥇',ARGINT:'🥈',BRONZ:'🥉'};
+  document.getElementById('rmedal').textContent=ic[medal]||'📄';
+  document.getElementById('rscore').textContent=fmt(tot);
+  document.getElementById('rsub').textContent=`puncte din ${mx}`;
+  document.getElementById('rpremiu').textContent=[premiu,medal?`Medalie de ${medal[0]+medal.slice(1).toLowerCase()}`:'Fără medalie'].filter(Boolean).join(' · ');
+  if(medal==='AUR') launchConfetti();
+  // Bars
+  const mp=mx/4;
+  document.getElementById('rrows').innerHTML=sliderScores.map((s,i)=>`
+    <div class="rb">
+      <div class="rbl">Prob. ${i+1}</div>
+      <div class="rbw"><div class="rbb" style="width:0" data-w="${(s/mp)*100}"></div></div>
+      <span class="rbs">${fmt(s)}</span>
+      <span class="rbm">/ ${mp}</span>
+    </div>
+  `).join('');
+  document.getElementById('rtotv').textContent=fmt(tot);
+  setTimeout(()=>{ document.querySelectorAll('.rbb[data-w]').forEach(b=>b.style.width=b.dataset.w+'%'); },200);
+  // Barem
+  const burl=DB[yr].bar[cls];
+  document.getElementById('baremlink').href=burl;
+  document.getElementById('bvw').src=`https://docs.google.com/gviewer?embedded=true&url=${encodeURIComponent(burl)}`;
+  // Manual scoring
+  buildManual(mp);
+  // Ranking with slider scores
+  renderRanking(tot,medal,premiu);
+  // Init live result
+  updateLiveResult();
+}
+
+function buildManual(mp){
+  const c=document.getElementById('ms-inputs'); c.innerHTML='';
+  const mx=DB[yr]?.maxScore||28;
+  for(let i=0;i<4;i++){
+    manScores[i]=sliderScores[i];
+    const row=document.createElement('div'); row.className='ms-row';
+    row.innerHTML=`
+      <span class="ms-lbl">PROB. ${i+1}</span>
+      <input type="number" class="ms-in" id="ms${i}" min="0" max="${mp}" step=".5"
+        value="${fmt(sliderScores[i])}" oninput="onManual(${i},this.value)">
+      <span class="ms-mx">/ ${mp}</span>
+    `;
+    c.appendChild(row);
+  }
+  const tot=manScores.reduce((a,b)=>a+b,0);
+  const tr=document.createElement('div'); tr.className='ms-tot';
+  tr.innerHTML=`<span class="ms-tot-l">Total</span><span class="ms-tot-v" id="mstot">${fmt(tot)} / ${mx}</span>`;
+  c.appendChild(tr);
+}
+
+function onManual(i,v){
+  const val=parseFloat(v); manScores[i]=isNaN(val)?0:val;
+  const tot=manScores.reduce((a,b)=>a+b,0);
+  const mx=DB[yr]?.maxScore||28;
+  const el=document.getElementById('mstot'); if(el) el.textContent=`${fmt(tot)} / ${mx}`;
+  updateLiveResult();
+}
+
+/* ──── LIVE RESULT (right side of manual scoring) ──── */
+function updateLiveResult(){
+  const tot=manScores.reduce((a,b)=>a+b,0);
+  const {medal,rank,premiu}=getMedal(tot);
+  const mx=DB[yr]?.maxScore||28;
+  const ic={AUR:'🥇',ARGINT:'🥈',BRONZ:'🥉'};
+
+  document.getElementById('lr-medal').textContent=ic[medal]||'📄';
+  document.getElementById('lr-score').textContent=fmt(tot);
+  document.getElementById('lr-of').textContent=`puncte din ${mx}`;
+  document.getElementById('lr-premiu').textContent=medal
+    ? [premiu, `Medalie de ${medal[0]+medal.slice(1).toLowerCase()}`].filter(Boolean).join(' · ')
+    : 'Fără medalie';
+  document.getElementById('lr-rank').textContent=rank?`Locul ${rank} în clasament`:'';
+
+  // Glow effect
+  const box=document.getElementById('lrbox');
+  box.className='live-result';
+  if(medal==='AUR')    box.classList.add('gold-glow');
+  if(medal==='ARGINT') box.classList.add('silver-glow');
+  if(medal==='BRONZ')  box.classList.add('bronze-glow');
+
+  // Mini rank table
+  const minitable=document.getElementById('lr-minitable');
+  if(!ONM[yr]?.clase?.[cls]){ minitable.innerHTML=''; return; }
+  const elevi=[...ONM[yr].clase[cls]].sort((a,b)=>(b.punctaj||0)-(a.punctaj||0));
+  const you={nume:'Tu',judet:'—',punctaj:tot,medalieSSMR:medal,premiu,_you:true};
+  const all=[...elevi,you].sort((a,b)=>(b.punctaj||0)-(a.punctaj||0));
+  const yi=all.findIndex(e=>e._you);
+
+  // Update full ranking pos
+  document.getElementById('rk-pos').textContent=`Locul ${yi+1} din ${all.length}`;
+
+  const start=Math.max(0,yi-2), end=Math.min(all.length,yi+4);
+  const sl=all.slice(start,end);
+  minitable.innerHTML=`
+    <div class="mr-hd">CLASAMENT · LOC ${yi+1} / ${all.length}</div>
+    ${sl.map((e,wi)=>{
+      const rr=start+wi+1, iy=e._you;
+      const mb=e.medalieSSMR?`<span class="mbadge ${e.medalieSSMR}">${e.medalieSSMR}</span>`:'';
+      return `<div class="mr-row ${iy?'you':''}">
+        <span class="mr-rk">${rr}</span>
+        <span class="mr-nm ${iy?'you':''}">${iy?'⭐ Tu':esc(e.nume)}</span>
+        <span class="mr-sc">${fmt(e.punctaj||0)}</span>
+        ${mb}
+      </div>`;
+    }).join('')}
+  `;
+
+  // Also update full table with new "you" position
+  renderRanking(tot,medal,premiu);
+}
+
+function renderRanking(tot,medal,premiu){
+  document.getElementById('rk-yr').textContent=`ONM ${yr} · Clasa ${cls}`;
+  if(!ONM[yr]?.clase?.[cls]) return;
+  const elevi=[...ONM[yr].clase[cls]].sort((a,b)=>(b.punctaj||0)-(a.punctaj||0));
+  const you={nume:'Tu',judet:'—',punctaj:tot,medalieSSMR:medal,premiu,_you:true};
+  const all=[...elevi,you].sort((a,b)=>(b.punctaj||0)-(a.punctaj||0));
+  const yi=all.findIndex(e=>e._you);
+  document.getElementById('rk-pos').textContent=`Locul ${yi+1} din ${all.length}`;
+  const start=Math.max(0,yi-4), end=Math.min(all.length,yi+6);
+  const sl=all.slice(start,end);
+  document.getElementById('rktable').innerHTML=sl.map((e,wi)=>{
+    const rr=start+wi+1, iy=e._you;
+    const mb=e.medalieSSMR?`<span class="mbadge ${e.medalieSSMR}">${e.medalieSSMR}</span>`:'<span style="color:var(--muted);font-size:11px">—</span>';
+    return `<div class="rt-row ${iy?'you':''}">
+      <span class="rt-rk">${rr}</span>
+      <span class="rt-nm ${iy?'you':''}">${iy?'⭐ Tu':esc(e.nume)}</span>
+      <span class="rt-sc">${fmt(e.punctaj||0)}</span>
+      ${mb}
+    </div>`;
+  }).join('');
+}
+
+/* ──── CONFETTI ──── */
+function launchConfetti(){
+  const shapes=['◆','★','●','▲','■','✦'];
+  const cols=['#9b6dff','#f5a623','#22d3a2','#f47068','#c4a5ff','#ffd27a','#e879f9','#38bdf8'];
+  for(let i=0;i<90;i++){
+    const c=document.createElement('div'); c.className='conf';
+    const use=Math.random()>.45;
+    if(use) c.textContent=shapes[Math.floor(Math.random()*shapes.length)];
+    const sz=use?(12+Math.random()*16):(6+Math.random()*9);
+    c.style.cssText=`left:${Math.random()*100}%;font-size:${sz}px;color:${cols[Math.floor(Math.random()*cols.length)]};width:${sz}px;height:${sz}px;background:${use?'transparent':cols[Math.floor(Math.random()*cols.length)]};border-radius:${use?'0':Math.random()>.5?'50%':'2px'};--d:${2.5+Math.random()*4}s;--dl:${Math.random()*2.5}s;--dx:${(Math.random()-.5)*130}px`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),7500);
+  }
+}
+
+/* ──── RESET ──── */
+function resetAll(){
+  sliderScores=[0,0,0,0]; manScores=[0,0,0,0];
+  cls=null; yr=null; clearInterval(tInterval); tSecs=14400; tRunning=false;
+  trans(()=>{
+    document.getElementById('s1').style.display='block';
+    document.getElementById('s2').style.display='none';
+    document.getElementById('s3').style.display='none';
+    document.getElementById('tbar').classList.add('hidden');
+    document.getElementById('pcard').style.display='none';
+    document.getElementById('bvw').src='';
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('sel'));
+    window.scrollTo(0,0);
+  });
+}
+
+const fmt=v=>{ const n=parseFloat(v)||0; return n%1?n.toFixed(1):String(Math.round(n)); };
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ──── LOAD DATA ──── */
+fetch('onm_all.json').then(r=>r.json()).then(d=>{ONM=d;if(cls&&yr)showCard();}).catch(()=>{ONM={};});
+</script>
+</body>
+</html>

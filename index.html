@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONM Arhivă — Olimpiada Națională de Matematică</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050509; --bg2:#0a0a14; --bg3:rgba(14,14,24,.85);
+  --border:rgba(120,90,255,.13); --border2:rgba(150,110,255,.28);
+  --text:#ede8ff; --muted:#605878;
+  --accent:#9b6dff; --accent2:#c4a5ff;
+  --teal:#2dd4bf; --pink:#e879f9;
+  --gold:#f5a623; --gold2:#ffd27a;
+  --silver:#9db4c0; --bronze:#c4824a;
+  --green:#22d3a2; --red:#f47068;
+  --glow:rgba(155,109,255,.18); --glow2:rgba(155,109,255,.45);
+  --f:'Outfit',sans-serif; --m:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--f);font-size:15px;min-height:100vh;overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ── */
+#cur,#cur2{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cur{width:10px;height:10px;background:var(--accent2);mix-blend-mode:screen;transition:width .15s,height .15s,background .2s;}
+#cur2{width:32px;height:32px;border:1.5px solid rgba(155,109,255,.5);transition:transform .2s cubic-bezier(.22,1,.36,1),width .25s,height .25s,border-color .25s;}
+body:has(a:hover) #cur,body:has(button:hover) #cur{width:18px;height:18px;background:var(--pink);}
+body:has(a:hover) #cur2,body:has(button:hover) #cur2{width:48px;height:48px;border-color:var(--pink);}
+
+/* ── AURORA ── */
+#aurora{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;}
+
+/* ── GRID ── */
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(120,90,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(120,90,255,.032) 1px,transparent 1px);
+  background-size:56px 56px;animation:gridScroll 40s linear infinite;}
+@keyframes gridScroll{to{background-position:56px 56px;}}
+
+/* ── ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;animation:orbDrift var(--t,22s) ease-in-out infinite alternate;}
+.o1{width:600px;height:500px;top:-15%;left:-12%;background:radial-gradient(circle,rgba(80,40,200,.1),transparent 65%);--t:28s;}
+.o2{width:450px;height:400px;bottom:-10%;right:-8%;background:radial-gradient(circle,rgba(60,20,160,.09),transparent 65%);--t:20s;}
+.o3{width:280px;height:280px;top:45%;left:58%;background:radial-gradient(circle,rgba(232,121,249,.06),transparent 65%);--t:14s;}
+@keyframes orbDrift{to{transform:translate(40px,-50px) scale(1.12);}}
+
+/* ── PARTICLES ── */
+.px{position:fixed;border-radius:50%;pointer-events:none;z-index:0;opacity:0;animation:pxRise var(--d,10s) linear var(--dl,0s) infinite;}
+@keyframes pxRise{0%{transform:translateY(102vh) scale(0);opacity:0;}5%{opacity:var(--op,.3);transform:translateY(95vh) scale(1);}90%{opacity:var(--op,.3);}100%{transform:translateY(-5vh) translateX(var(--dx,30px)) scale(.5);opacity:0;}}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;height:58px;padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,5,9,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+nav::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent) 30%,var(--pink) 70%,transparent);
+  background-size:200% 100%;animation:navLine 4s linear infinite;}
+@keyframes navLine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.nav-logo{font-family:var(--m);font-size:13px;color:var(--accent2);text-decoration:none;
+  display:flex;align-items:center;gap:.7rem;letter-spacing:.06em;}
+.gem{width:20px;height:20px;animation:gemHue 8s linear infinite;flex-shrink:0;}
+@keyframes gemHue{to{filter:hue-rotate(360deg) drop-shadow(0 0 6px var(--accent));}}
+
+.nav-mid{display:flex;gap:1.8rem;list-style:none;}
+.nav-mid a{font-family:var(--m);font-size:12px;color:var(--muted);text-decoration:none;
+  letter-spacing:.06em;transition:color .25s;position:relative;padding:.3rem .4rem;cursor:none;}
+.nav-mid a::after{content:'';position:absolute;bottom:0;left:.4rem;right:.4rem;height:1px;
+  background:var(--accent2);transform:scaleX(0);transition:transform .3s;}
+.nav-mid a:hover,.nav-mid a.on{color:var(--accent2);}
+.nav-mid a.on::after,.nav-mid a:hover::after{transform:scaleX(1);}
+
+.nav-btn{font-family:var(--m);font-size:12px;padding:.42rem .95rem;border-radius:8px;
+  border:1px solid var(--border2);background:transparent;color:var(--accent2);
+  text-decoration:none;letter-spacing:.06em;transition:all .25s;cursor:none;
+  position:relative;overflow:hidden;}
+.nav-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(155,109,255,.14),transparent);opacity:0;transition:opacity .25s;}
+.nav-btn:hover{border-color:var(--accent);box-shadow:0 0 14px var(--glow2);}
+.nav-btn:hover::before{opacity:1;}
+
+/* ── PAGES ── */
+.page{display:none;position:relative;z-index:1;}
+.page.on{display:block;}
+
+/* ── PAGE TRANSITION ── */
+.ptrans{position:fixed;inset:0;z-index:500;pointer-events:none;
+  background:linear-gradient(135deg,#5b21b6,var(--accent),var(--pink));transform:translateX(-100%);}
+.ptrans.in{animation:ptIn .42s cubic-bezier(.22,1,.36,1) forwards;}
+.ptrans.out{animation:ptOut .42s cubic-bezier(.22,1,.36,1) .05s forwards;}
+@keyframes ptIn{to{transform:translateX(0)}}
+@keyframes ptOut{from{transform:translateX(0)}to{transform:translateX(100%)}}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--m);font-size:12px;letter-spacing:.06em;
+  padding:.48rem 1rem;border-radius:8px;border:1px solid var(--border2);
+  background:transparent;color:var(--accent2);cursor:none;
+  transition:all .25s;white-space:nowrap;position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(155,109,255,.14),transparent);opacity:0;transition:opacity .25s;}
+.btn:hover{border-color:var(--accent);box-shadow:0 0 16px var(--glow2);transform:translateY(-1px);}
+.btn:hover::before{opacity:1;}
+.btn.on{background:rgba(155,109,255,.18);border-color:var(--accent);color:var(--accent2);font-weight:600;}
+
+/* ── ANIMATIONS ── */
+@keyframes fromBelow{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes fromLeft{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:none}}
+@keyframes gradSwirl{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* ══════════════════════ HOME ══════════════════════ */
+.hero{min-height:calc(100vh - 58px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;}
+
+.hero-eyebrow{font-family:var(--m);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--accent);display:flex;align-items:center;gap:.7rem;margin-bottom:1rem;
+  opacity:0;animation:fromBelow .6s cubic-bezier(.22,1,.36,1) .1s forwards;}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:22px;height:1px;background:var(--accent);}
+
+.hero-title{font-family:var(--f);font-weight:900;line-height:1.04;
+  font-size:clamp(2.8rem,7vw,5.5rem);margin-bottom:1.2rem;
+  opacity:0;animation:fromBelow .9s cubic-bezier(.22,1,.36,1) .25s forwards;}
+.ht-main{display:block;
+  background:linear-gradient(120deg,#fff 0%,var(--accent2) 45%,var(--pink) 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:gradSwirl 7s ease infinite;}
+.ht-sub{display:block;font-size:.46em;font-weight:400;font-style:italic;margin-top:.18em;
+  background:linear-gradient(120deg,var(--accent2),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+.hero-desc{font-size:15px;color:var(--muted);max-width:500px;margin:0 auto 2.5rem;line-height:1.7;
+  opacity:0;animation:fromBelow .7s cubic-bezier(.22,1,.36,1) .45s forwards;}
+
+.hero-stats{display:flex;gap:2.5rem;justify-content:center;margin-bottom:3rem;
+  opacity:0;animation:fromBelow .7s cubic-bezier(.22,1,.36,1) .6s forwards;}
+.hstat{text-align:center;}
+.hstat-n{font-family:var(--f);font-weight:900;font-size:2.8rem;line-height:1;
+  background:linear-gradient(135deg,#fff,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 12px rgba(155,109,255,.3));}
+.hstat-l{font-family:var(--m);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+.hero-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;max-width:680px;width:100%;
+  background:var(--border);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  opacity:0;animation:fromBelow .7s cubic-bezier(.22,1,.36,1) .75s forwards;}
+.hcard{background:var(--bg2);padding:1.8rem;cursor:none;transition:background .25s;
+  text-align:left;text-decoration:none;color:var(--text);display:block;position:relative;overflow:hidden;}
+.hcard::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(155,109,255,.09),transparent);opacity:0;transition:opacity .25s;}
+.hcard:hover{background:rgba(12,12,22,.95);}
+.hcard:hover::before{opacity:1;}
+.hc-ic{width:38px;height:38px;border-radius:10px;background:rgba(155,109,255,.1);
+  border:1px solid rgba(155,109,255,.2);display:flex;align-items:center;justify-content:center;
+  margin-bottom:1rem;font-size:18px;transition:transform .3s;}
+.hcard:hover .hc-ic{transform:scale(1.12) rotate(-6deg);}
+.hc-t{font-family:var(--f);font-size:1.05rem;font-weight:700;margin-bottom:.28rem;}
+.hc-d{font-size:13px;color:var(--muted);line-height:1.5;}
+.hc-arr{position:absolute;right:1.5rem;bottom:1.5rem;font-family:var(--m);font-size:12px;
+  color:var(--accent);opacity:0;transition:opacity .25s,transform .25s;}
+.hcard:hover .hc-arr{opacity:1;transform:translateX(5px);}
+
+/* ══════════════════════ SECTION ══════════════════════ */
+.sec{max-width:980px;margin:0 auto;padding:4rem 2rem;}
+.sec-hd{margin-bottom:2.5rem;}
+.sec-ey{font-family:var(--m);font-size:10px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--accent);display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.sec-ey::before{content:'';width:18px;height:1px;background:var(--accent);}
+.sec-title{font-family:var(--f);font-weight:900;font-size:2.2rem;
+  background:linear-gradient(120deg,var(--text),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── FILTERS ROW ── */
+.frow{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.6rem;}
+
+/* ── SEARCH ── */
+.srch-wrap{position:relative;margin-bottom:1.6rem;}
+.srch-ic{position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.srch-in{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+  padding:1rem 1.2rem 1rem 3rem;color:var(--text);font-family:var(--f);font-size:15px;
+  outline:none;transition:border-color .3s,box-shadow .3s;cursor:none;}
+.srch-in:focus{border-color:var(--accent);box-shadow:0 0 20px rgba(155,109,255,.2);}
+.srch-in::placeholder{color:var(--muted);}
+.rcount{font-family:var(--m);font-size:11px;color:var(--muted);letter-spacing:.05em;margin-bottom:1rem;}
+
+/* ── RESULT CARDS ── */
+.rcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:1rem 1.4rem;margin-bottom:.4rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  animation:fadeUp .3s ease both;position:relative;overflow:hidden;}
+.rcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  transform:scaleY(0);transition:transform .25s;border-radius:0 0 2px 2px;}
+.rcard:hover{border-color:var(--border2);transform:translateX(6px);box-shadow:0 0 20px rgba(155,109,255,.07);}
+.rcard:hover::before{transform:scaleY(1);}
+.rname{font-family:var(--f);font-weight:700;font-size:1rem;margin-bottom:2px;}
+.rmeta{font-size:12px;color:var(--muted);font-family:var(--m);}
+.rright{display:flex;align-items:center;gap:.65rem;flex-shrink:0;}
+.mbadge{font-family:var(--m);font-size:10px;letter-spacing:.07em;padding:.22rem .6rem;border-radius:999px;}
+.mAUR{background:rgba(245,166,35,.14);color:var(--gold);border:1px solid rgba(245,166,35,.3);}
+.mARGINT{background:rgba(157,180,192,.12);color:var(--silver);border:1px solid rgba(157,180,192,.28);}
+.mBRONZ{background:rgba(196,130,74,.12);color:var(--bronze);border:1px solid rgba(196,130,74,.28);}
+.sbadge{font-family:var(--m);font-size:13px;color:var(--muted);}
+.pbadge{font-family:var(--m);font-size:9px;color:var(--muted);opacity:.7;}
+
+/* ══════════════════════ JUDETE ══════════════════════ */
+/* Bar chart */
+.jbars{display:flex;flex-direction:column;gap:.55rem;margin-bottom:2.5rem;}
+.jbar-row{display:flex;align-items:center;gap:.9rem;}
+.jbar-lbl{font-family:var(--m);font-size:11px;color:var(--muted);width:130px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jbar-track{flex:1;height:22px;background:rgba(155,109,255,.06);border-radius:5px;overflow:hidden;display:flex;position:relative;}
+.jbar-track::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);pointer-events:none;}
+.jbar-a{background:linear-gradient(90deg,rgba(245,166,35,.75),rgba(245,166,35,.5));height:100%;transition:width 1.3s cubic-bezier(.22,1,.36,1);}
+.jbar-s{background:linear-gradient(90deg,rgba(157,180,192,.5),rgba(157,180,192,.35));height:100%;transition:width 1.3s cubic-bezier(.22,1,.36,1) .08s;}
+.jbar-b{background:linear-gradient(90deg,rgba(196,130,74,.45),rgba(196,130,74,.28));height:100%;transition:width 1.3s cubic-bezier(.22,1,.36,1) .16s;}
+.jbar-val{font-family:var(--m);font-size:11px;color:var(--gold);width:32px;text-align:right;flex-shrink:0;font-weight:700;}
+
+/* Table header */
+.jthead{display:grid;grid-template-columns:2.4rem 1fr 60px 60px 60px 60px;gap:.8rem;
+  padding:.4rem 1.4rem;margin-bottom:.4rem;}
+.jthead span{font-family:var(--m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+
+/* Table rows */
+.jrow{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:.85rem 1.4rem;
+  display:grid;grid-template-columns:2.4rem 1fr 60px 60px 60px 60px;align-items:center;gap:.8rem;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  animation:fadeUp .3s ease both;position:relative;overflow:hidden;}
+.jrow::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:0 0 2px 2px;transform:scaleY(0);transition:transform .25s;}
+.jrow:nth-child(1)::before{background:var(--gold);}
+.jrow:nth-child(2)::before{background:var(--silver);}
+.jrow:nth-child(3)::before{background:var(--bronze);}
+.jrow:nth-child(n+4)::before{background:var(--accent);}
+.jrow:hover{border-color:var(--border2);transform:translateX(6px);box-shadow:0 0 20px rgba(155,109,255,.07);}
+.jrow:hover::before{transform:scaleY(1);}
+.jrk{font-family:var(--m);font-size:12px;font-weight:700;text-align:center;}
+.jrk.g1{color:var(--gold);text-shadow:0 0 8px rgba(245,166,35,.5);}
+.jrk.g2{color:var(--silver);}
+.jrk.g3{color:var(--bronze);}
+.jrk.gn{color:var(--muted);}
+.jnm{font-size:14px;font-weight:600;}
+.jcnt{font-family:var(--m);font-size:13px;font-weight:700;text-align:center;}
+.jcnt.a{color:var(--gold);}
+.jcnt.s{color:var(--silver);}
+.jcnt.b{color:var(--bronze);}
+.jcnt.t{color:var(--muted);font-size:11px;font-weight:400;}
+
+/* ══════════════════════ HOF ELEVI ══════════════════════ */
+/* PODIUM */
+.podium{display:grid;grid-template-columns:1fr 1.18fr 1fr;gap:1px;
+  background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:2rem;}
+.pod{background:var(--bg2);padding:2rem 1.4rem;text-align:center;
+  position:relative;overflow:hidden;transition:background .3s;}
+.pod:hover{background:rgba(12,12,24,.95);}
+.pod.p1{background:linear-gradient(180deg,rgba(245,166,35,.07),var(--bg2));}
+.pod.p2{background:linear-gradient(180deg,rgba(157,180,192,.05),var(--bg2));}
+.pod.p3{background:linear-gradient(180deg,rgba(196,130,74,.05),var(--bg2));}
+.pod::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.pod.p1::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:shimmerTop 3s linear infinite;}
+.pod.p2::before{background:linear-gradient(90deg,transparent,var(--silver),transparent);opacity:.7;}
+.pod.p3::before{background:linear-gradient(90deg,transparent,var(--bronze),transparent);opacity:.6;}
+@keyframes shimmerTop{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.pod::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,255,255,.025),transparent);
+  pointer-events:none;}
+
+.pod-trophy{font-size:2.2rem;display:block;margin-bottom:.6rem;
+  animation:floatY 3s ease-in-out infinite;}
+.pod.p1 .pod-trophy{font-size:3rem;animation:floatY 2.5s ease-in-out infinite,auraTrophy 3s ease-in-out infinite alternate;}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes auraTrophy{0%{filter:drop-shadow(0 0 6px rgba(245,166,35,.4))}100%{filter:drop-shadow(0 0 20px rgba(245,166,35,.9))}}
+
+.pod-pos{font-family:var(--m);font-size:9px;letter-spacing:.22em;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;}
+.pod-name{font-family:var(--f);font-weight:800;font-size:.98rem;margin-bottom:.25rem;line-height:1.2;}
+.pod.p1 .pod-name{font-size:1.12rem;background:linear-gradient(135deg,#fff,var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pod-jud{font-family:var(--m);font-size:10px;color:var(--muted);margin-bottom:.35rem;}
+.pod-yrs{font-family:var(--m);font-size:9px;color:var(--muted);letter-spacing:.06em;margin-bottom:.8rem;}
+/* Medal text lines for podium */
+.pod-medal-lines{display:flex;flex-direction:column;gap:3px;align-items:center;}
+.pod-mline{font-family:var(--m);font-size:10px;letter-spacing:.03em;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.pod-mline.a{color:var(--gold);background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.25);}
+.pod-mline.s{color:var(--silver);background:rgba(157,180,192,.1);border:1px solid rgba(157,180,192,.22);}
+.pod-mline.b{color:var(--bronze);background:rgba(196,130,74,.1);border:1px solid rgba(196,130,74,.22);}
+
+/* HOF LIST */
+.hof-list{display:grid;gap:.42rem;}
+.hof-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:.78rem 1.3rem;display:flex;align-items:center;gap:.9rem;
+  animation:fadeUp .3s ease both;transition:border-color .2s,transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;}
+.hof-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  transform:scaleY(0);transition:transform .25s;}
+.hof-row:hover{border-color:var(--border2);transform:translateX(6px);box-shadow:0 0 18px rgba(155,109,255,.07);}
+.hof-row:hover::before{transform:scaleY(1);}
+.hof-rk{font-family:var(--m);font-size:11px;color:var(--muted);width:26px;text-align:right;flex-shrink:0;}
+.hof-nm{flex:1;font-size:14px;font-weight:600;min-width:0;}
+.hof-jd{font-family:var(--m);font-size:10px;color:var(--muted);flex-shrink:0;width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hof-yrs{font-family:var(--m);font-size:9px;color:var(--muted);letter-spacing:.05em;flex-shrink:0;width:90px;text-align:right;}
+/* Medal text pills for list */
+.hof-mpills{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;min-width:160px;}
+.mpill{font-family:var(--m);font-size:10px;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.mpill.a{color:var(--gold);background:rgba(245,166,35,.13);border:1px solid rgba(245,166,35,.28);}
+.mpill.s{color:var(--silver);background:rgba(157,180,192,.1);border:1px solid rgba(157,180,192,.25);}
+.mpill.b{color:var(--bronze);background:rgba(196,130,74,.1);border:1px solid rgba(196,130,74,.25);}
+
+/* EMPTY */
+.empty{text-align:center;padding:4rem 2rem;color:var(--muted);}
+.empty-ic{font-size:2.5rem;opacity:.22;margin-bottom:1rem;}
+.empty-tx{font-family:var(--f);font-size:1.1rem;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(155,109,255,.22);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+@media(max-width:700px){
+  .hero-cards{grid-template-columns:1fr;}
+  .hero-stats{gap:1.5rem;}
+  .podium{grid-template-columns:1fr;}
+  .hof-jd,.hof-yrs{display:none;}
+  .hof-mpills{min-width:auto;}
+  .jrow{grid-template-columns:1.8rem 1fr auto auto;}
+  .jrow .jcnt.s,.jrow .jcnt.b,.jthead span:nth-child(4),.jthead span:nth-child(5){display:none;}
+  .nav-mid{gap:.8rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+<canvas id="aurora"></canvas>
+<div class="grid"></div>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="ptrans" id="pt"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg class="gem" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <polygon points="10,2 18,8 15,17 5,17 2,8" fill="none" stroke="url(#g1)" stroke-width="1.3"/>
+      <polygon points="10,2 18,8 10,6" fill="rgba(155,109,255,.3)"/>
+      <polygon points="10,2 2,8 10,6" fill="rgba(196,165,255,.2)"/>
+      <polygon points="10,6 18,8 15,17 5,17 2,8" fill="rgba(155,109,255,.07)"/>
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="20" y2="20">
+        <stop offset="0%" stop-color="#c4a5ff"/><stop offset="100%" stop-color="#6d28d9"/>
+      </linearGradient></defs>
+    </svg>
+    ONM · Arhivă
+  </a>
+  <ul class="nav-mid">
+    <li><a href="#" onclick="go('home')" id="nl-home" class="on">Acasă</a></li>
+    <li><a href="#" onclick="go('search')" id="nl-search">Caută elev</a></li>
+    <li><a href="#" onclick="go('judete')" id="nl-judete">Județe</a></li>
+    <li><a href="#" onclick="go('elevi')" id="nl-elevi">Hall of Fame</a></li>
+  </ul>
+  <a class="nav-btn" href="simulare.html">✎ Simulare →</a>
+</nav>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div class="page on" id="page-home">
+  <div class="hero">
+    <div class="hero-eyebrow">Olimpiada Națională de Matematică</div>
+    <h1 class="hero-title">
+      <span class="ht-main">Arhiva olimpicilor</span>
+      <span class="ht-sub">România · 2010 – 2026</span>
+    </h1>
+    <p class="hero-desc">Rezultatele oficiale ale fazei naționale, clasele IX–XII. Caută elevi, explorează clasamente județene și Hall of Fame.</p>
+
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-n" id="st-total">—</div><div class="hstat-l">Participanți</div></div>
+      <div class="hstat"><div class="hstat-n" id="st-med">—</div><div class="hstat-l">Medalii</div></div>
+      <div class="hstat"><div class="hstat-n">14</div><div class="hstat-l">Ediții</div></div>
+      <div class="hstat"><div class="hstat-n">42</div><div class="hstat-l">Județe</div></div>
+    </div>
+
+    <div class="hero-cards">
+      <a class="hcard" href="#" onclick="go('search');return false;">
+        <div class="hc-ic">⌕</div>
+        <div class="hc-t">Caută un elev</div>
+        <div class="hc-d">Toate medaliile unui elev de-a lungul anilor de concurs</div>
+        <span class="hc-arr">→</span>
+      </a>
+      <a class="hcard" href="#" onclick="go('judete');return false;">
+        <div class="hc-ic">◎</div>
+        <div class="hc-t">Clasament județe</div>
+        <div class="hc-d">Performanța cumulată pe județe, 2010–2026</div>
+        <span class="hc-arr">→</span>
+      </a>
+      <a class="hcard" href="#" onclick="go('elevi');return false;">
+        <div class="hc-ic">✦</div>
+        <div class="hc-t">Hall of Fame · Elevi</div>
+        <div class="hc-d">Cei mai titulați elevi din istoria ONM</div>
+        <span class="hc-arr">→</span>
+      </a>
+      <a class="hcard" href="simulare.html">
+        <div class="hc-ic">✎</div>
+        <div class="hc-t">Simulare examen</div>
+        <div class="hc-d">Timer 4h, barem deblocat după finish, medalie calculată</div>
+        <span class="hc-arr">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SEARCH ══════════════ -->
+<div class="page" id="page-search">
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="sec-ey">Baza de date · 2010–2026</div>
+      <h2 class="sec-title">Caută un elev</h2>
+    </div>
+    <div class="srch-wrap">
+      <span class="srch-ic">⌕</span>
+      <input type="text" class="srch-in" id="srch" placeholder="Nume sau prenume…" oninput="doSearch()">
+    </div>
+    <div class="frow" id="mf">
+      <button class="btn on" onclick="setMF('ALL',this)">Toate medaliile</button>
+      <button class="btn" onclick="setMF('AUR',this)">🥇 Aur</button>
+      <button class="btn" onclick="setMF('ARGINT',this)">🥈 Argint</button>
+      <button class="btn" onclick="setMF('BRONZ',this)">🥉 Bronz</button>
+    </div>
+    <div class="frow" id="yf"></div>
+    <div class="rcount" id="rc">Caută un elev sau aplică filtre</div>
+    <div id="sr"></div>
+  </div>
+</div>
+
+<!-- ══════════════ JUDETE ══════════════ -->
+<div class="page" id="page-judete">
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="sec-ey">Clasament all-time · 42 județe</div>
+      <h2 class="sec-title">Hall of Fame · Județe</h2>
+    </div>
+    <div class="frow" id="jyf">
+      <button class="btn on" onclick="setJY('ALL',this)">Toți anii</button>
+    </div>
+    <!-- bar chart -->
+    <div style="font-family:var(--m);font-size:10px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-bottom:1rem;">Top 15 · medalii de aur</div>
+    <div class="jbars" id="jbars"></div>
+    <!-- table -->
+    <div class="jthead">
+      <span></span>
+      <span style="color:var(--muted)">Județ</span>
+      <span style="color:var(--gold);text-align:center">Aur</span>
+      <span style="color:var(--silver);text-align:center">Arg</span>
+      <span style="color:var(--bronze);text-align:center">Brz</span>
+      <span style="color:var(--muted);text-align:center">Scor</span>
+    </div>
+    <div id="jlist"></div>
+  </div>
+</div>
+
+<!-- ══════════════ HOF ELEVI ══════════════ -->
+<div class="page" id="page-elevi">
+  <div class="sec" style="max-width:1060px;">
+    <div class="sec-hd">
+      <div class="sec-ey">Cei mai titulați olimpici · 2010–2026</div>
+      <h2 class="sec-title">Hall of Fame · Elevi</h2>
+    </div>
+    <div id="podium"></div>
+    <div class="hof-list" id="hoflist"></div>
+  </div>
+</div>
+
+<script>
+/* ─── CURSOR ─── */
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=-200,my=-200,rx=-200,ry=-200;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function lp(){cur.style.cssText=`left:${mx}px;top:${my}px`;rx+=(mx-rx)*.11;ry+=(my-ry)*.11;cur2.style.cssText=`left:${rx}px;top:${ry}px`;requestAnimationFrame(lp);})();
+
+/* ─── AURORA ─── */
+(()=>{
+  const cv=document.getElementById('aurora'),ctx=cv.getContext('2d');
+  let W,H;
+  const rz=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;};
+  rz();window.addEventListener('resize',rz);
+  const ws=[
+    {c:[80,40,210],s:.0005,a:.17,p:0,y:.38},
+    {c:[60,20,170],s:.00035,a:.13,p:2.1,y:.58},
+    {c:[170,70,255],s:.0007,a:.09,p:4.3,y:.22},
+    {c:[220,80,240],s:.00045,a:.07,p:1.5,y:.72},
+  ];
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    ws.forEach(w=>{
+      w.p+=w.s;
+      const g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,`rgba(${w.c},0)`);
+      g.addColorStop(.5,`rgba(${w.c},.055)`);
+      g.addColorStop(1,`rgba(${w.c},0)`);
+      ctx.beginPath();ctx.moveTo(0,H);
+      for(let x=0;x<=W;x+=3){
+        const y=H*w.y+Math.sin(x*.005+w.p)*H*w.a+Math.cos(x*.0025+w.p*.8)*H*w.a*.5;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle=g;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  })();
+})();
+
+/* ─── PARTICLES ─── */
+(()=>{
+  const cols=['rgba(155,109,255,','rgba(196,165,255,','rgba(109,40,217,','rgba(232,121,249,'];
+  for(let i=0;i<26;i++){
+    const p=document.createElement('div');p.className='px';
+    const s=1.5+Math.random()*4,op=.12+Math.random()*.32;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*4)]}${op});--d:${8+Math.random()*14}s;--dl:${Math.random()*12}s;--dx:${(Math.random()-.5)*120}px;--op:${op}`;
+    document.body.appendChild(p);
+  }
+})();
+
+/* ─── TRANSITION ─── */
+function trans(cb){
+  const el=document.getElementById('pt');
+  el.classList.add('in');
+  el.addEventListener('animationend',function h(){
+    el.removeEventListener('animationend',h);
+    cb();
+    el.classList.remove('in');el.classList.add('out');
+    el.addEventListener('animationend',function h2(){el.removeEventListener('animationend',h2);el.classList.remove('out');});
+  });
+}
+
+/* ─── DATA ─── */
+let ALL=[], HOF=[], JUDETE=[];
+const YEARS=['2026','2025','2024','2023','2022','2019','2018','2017','2016','2014','2013','2012','2011','2010'];
+
+/* Judet normalization */
+const JM={
+  'B':'BUCUREȘTI','BUCURESTI':'BUCUREȘTI','BUCUREŞTI':'BUCUREȘTI','BUCUREȘTI':'BUCUREȘTI','Bucureşti':'BUCUREȘTI','București':'BUCUREȘTI',
+  'BUCURESTI-SECTOR1':'BUCUREȘTI','BUCURESTI-SECTOR2':'BUCUREȘTI','BUCURESTI-SECTOR3':'BUCUREȘTI','BUCURESTI-SECTOR4':'BUCUREȘTI',
+  'AB':'ALBA','ALBA':'ALBA','Alba':'ALBA','ALBA IULIA':'ALBA','AIUD':'ALBA','BLAJ':'ALBA',
+  'AR':'ARAD','ARAD':'ARAD','Arad':'ARAD',
+  'AG':'ARGEȘ','ARGEŞ':'ARGEȘ','ARGEȘ':'ARGEȘ','Argeş':'ARGEȘ','Argeș':'ARGEȘ','Alexandria':'ARGEȘ',
+  'BC':'BACĂU','BACĂU':'BACĂU','Bacău':'BACĂU',
+  'BH':'BIHOR','BIHOR':'BIHOR','Bihor':'BIHOR',
+  'BN':'BISTRIȚA-NĂSĂUD','BISTRIŢA-NĂSĂUD':'BISTRIȚA-NĂSĂUD','BISTRIȚA-NĂSĂUD':'BISTRIȚA-NĂSĂUD','BISTRIȚA- NĂSĂUD':'BISTRIȚA-NĂSĂUD','Bistriţa':'BISTRIȚA-NĂSĂUD','Bistrița':'BISTRIȚA-NĂSĂUD',
+  'BT':'BOTOȘANI','BOTOŞANI':'BOTOȘANI','BOTOȘANI':'BOTOȘANI','Botoşani':'BOTOȘANI','Botoșani':'BOTOȘANI',
+  'BV':'BRAȘOV','BRAŞOV':'BRAȘOV','BRAȘOV':'BRAȘOV','Braşov':'BRAȘOV',
+  'BR':'BRĂILA','BRĂILA':'BRĂILA','Brăila':'BRĂILA',
+  'BZ':'BUZĂU','BUZĂU':'BUZĂU','Buzau':'BUZĂU','Buzău':'BUZĂU',
+  'CS':'CARAȘ-SEVERIN','CARAŞ SEVERIN':'CARAȘ-SEVERIN','CARAȘ SEVERIN':'CARAȘ-SEVERIN','CARAȘ- SEVERIN':'CARAȘ-SEVERIN','CARAȘ-SEVERIN':'CARAȘ-SEVERIN',
+  'CL':'CĂLĂRAȘI','CĂLĂRAŞI':'CĂLĂRAȘI','CĂLĂRAȘI':'CĂLĂRAȘI','Călăraşi':'CĂLĂRAȘI',
+  'CJ':'CLUJ','CLUJ':'CLUJ','Cluj':'CLUJ','CLUJ-NAPOCA':'CLUJ',
+  'CT':'CONSTANȚA','CONSTANŢA':'CONSTANȚA','CONSTANȚA':'CONSTANȚA','Constanţa':'CONSTANȚA','Constanța':'CONSTANȚA','A CONSTANȚA':'CONSTANȚA',
+  'CV':'COVASNA','COVASNA':'COVASNA','Covasna':'COVASNA',
+  'DB':'DÂMBOVIȚA','DÂMBOVIŢA':'DÂMBOVIȚA','DÂMBOVIȚA':'DÂMBOVIȚA','Dâmboviţa':'DÂMBOVIȚA','Dâmbovița':'DÂMBOVIȚA',
+  'DJ':'DOLJ','DOLJ':'DOLJ','Dolj':'DOLJ','Craiova':'DOLJ','CRAIOVA':'DOLJ',
+  'GL':'GALAȚI','GALAŢI':'GALAȚI','GALAȚI':'GALAȚI','Galaţi':'GALAȚI','Galați':'GALAȚI',
+  'GR':'GIURGIU','GIURGIU':'GIURGIU','Giurgiu':'GIURGIU',
+  'GJ':'GORJ','GORJ':'GORJ','Gorj':'GORJ',
+  'HR':'HARGHITA','HARGHITA':'HARGHITA','Harghita':'HARGHITA',
+  'HD':'HUNEDOARA','HUNEDOARA':'HUNEDOARA','Hunedoara':'HUNEDOARA',
+  'IL':'IALOMIȚA','IALOMIŢA':'IALOMIȚA','IALOMIȚA':'IALOMIȚA','Ialomiţa':'IALOMIȚA',
+  'IS':'IAȘI','IAŞI':'IAȘI','IAȘI':'IAȘI','Iaşi':'IAȘI','Iași':'IAȘI',
+  'IF':'ILFOV','ILFOV':'ILFOV','Ilfov':'ILFOV',
+  'MM':'MARAMUREȘ','MARAMUREŞ':'MARAMUREȘ','MARAMUREȘ':'MARAMUREȘ','Maramureş':'MARAMUREȘ','Maramureș':'MARAMUREȘ','BAIA MARE':'MARAMUREȘ',
+  'MH':'MEHEDINȚI','MEHEDINŢI':'MEHEDINȚI','MEHEDINȚI':'MEHEDINȚI','Mehedinţi':'MEHEDINȚI','Mehedinți':'MEHEDINȚI',
+  'MS':'MUREȘ','MUREŞ':'MUREȘ','MUREȘ':'MUREȘ','Mureş':'MUREȘ','Mureș':'MUREȘ','TG-MUREȘ':'MUREȘ','Tg-Mureș':'MUREȘ',
+  'NT':'NEAMȚ','NEAMŢ':'NEAMȚ','NEAMȚ':'NEAMȚ','Neamţ':'NEAMȚ','Neamț':'NEAMȚ',
+  'OT':'OLT','OLT':'OLT','Olt':'OLT','SLATINA':'OLT',
+  'PH':'PRAHOVA','PRAHOVA':'PRAHOVA','Prahova':'PRAHOVA','Ploiești':'PRAHOVA','PLOIEȘTI':'PRAHOVA',
+  'SJ':'SĂLAJ','SĂLAJ':'SĂLAJ','Sălaj':'SĂLAJ',
+  'SM':'SATU MARE','SATU MARE':'SATU MARE','Satu Mare':'SATU MARE',
+  'SB':'SIBIU','SIBIU':'SIBIU','Sibiu':'SIBIU',
+  'SV':'SUCEAVA','SUCEAVA':'SUCEAVA','Suceava':'SUCEAVA',
+  'TR':'TELEORMAN','TELEORMAN':'TELEORMAN','Teleorman':'TELEORMAN',
+  'TM':'TIMIȘ','TIMIŞ':'TIMIȘ','TIMIȘ':'TIMIȘ','Timiş':'TIMIȘ','Timiș':'TIMIȘ','Timișoara':'TIMIȘ','TIMIȘOARA':'TIMIȘ',
+  'TL':'TULCEA','TULCEA':'TULCEA','Tulcea':'TULCEA',
+  'VL':'VÂLCEA','VÂLCEA':'VÂLCEA','Vâlcea':'VÂLCEA','Râmnicu Vâlcea':'VÂLCEA','RM. VALCEA':'VÂLCEA','RÂMNICU VÂLCEA':'VÂLCEA',
+  'VS':'VASLUI','VASLUI':'VASLUI','Vaslui':'VASLUI','Bârlad':'VASLUI',
+  'VN':'VRANCEA','VRANCEA':'VRANCEA','Vrancea':'VRANCEA','Vracea':'VRANCEA','VRANCEEA':'VRANCEA',
+};
+const normJ=j=>{if(!j)return null;j=String(j).trim();return JM[j]||JM[j.toUpperCase()]||null;};
+
+/* Helper: "🥇 de 5 ori" text */
+function medalText(n, emoji) {
+  if(n===0) return '';
+  const times = n===1 ? 'o dată' : `de ${n} ori`;
+  return `${emoji} ${times}`;
+}
+
+/* ─── NAVIGATION ─── */
+function go(id){
+  trans(()=>{
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('.nav-mid a').forEach(a=>a.classList.remove('on'));
+    document.getElementById('page-'+id).classList.add('on');
+    const nl=document.getElementById('nl-'+id);if(nl)nl.classList.add('on');
+    if(id==='search') buildYrFilter();
+    if(id==='judete'){buildJYFilter();renderJudete();}
+    if(id==='elevi') renderHOF();
+    window.scrollTo(0,0);
+  });
+  return false;
+}
+
+/* ─── SEARCH ─── */
+let mf='ALL', yf='ALL';
+function buildYrFilter(){
+  const c=document.getElementById('yf');
+  if(c.childElementCount) return;
+  c.innerHTML='<button class="btn on" onclick="setYF(\'ALL\',this)">Toți anii</button>'+
+    YEARS.map(y=>`<button class="btn" onclick="setYF('${y}',this)">${y}</button>`).join('');
+}
+function setMF(m,b){mf=m;document.querySelectorAll('#mf .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');doSearch();}
+function setYF(y,b){yf=y;document.querySelectorAll('#yf .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');doSearch();}
+
+function doSearch(){
+  const q=(document.getElementById('srch').value||'').toLowerCase().trim();
+  let list=[...ALL];
+  if(mf!=='ALL') list=list.filter(e=>e.medalieSSMR===mf);
+  if(yf!=='ALL') list=list.filter(e=>String(e.an)===yf);
+  if(q.length>=2) list=list.filter(e=>e.nume.toLowerCase().includes(q));
+  else if(q.length===1){document.getElementById('rc').textContent='Tastează cel puțin 2 caractere';document.getElementById('sr').innerHTML='';return;}
+  list.sort((a,b)=>{const mo=['AUR','ARGINT','BRONZ'];const d=mo.indexOf(a.medalieSSMR)-mo.indexOf(b.medalieSSMR);return d||((b.punctaj||0)-(a.punctaj||0));});
+  if(q.length<2&&mf==='ALL'&&yf==='ALL'){document.getElementById('rc').textContent='Caută un elev sau aplică filtre';document.getElementById('sr').innerHTML='';return;}
+  document.getElementById('rc').textContent=list.length?`${list.length} rezultat${list.length!==1?'e':''}`:'';
+  if(!list.length){document.getElementById('sr').innerHTML='<div class="empty"><div class="empty-ic">∅</div><div class="empty-tx">Niciun elev găsit</div></div>';return;}
+  document.getElementById('sr').innerHTML=list.slice(0,80).map((e,i)=>`
+    <div class="rcard" style="animation-delay:${i*.022}s">
+      <div>
+        <div class="rname">${esc(e.nume)}</div>
+        <div class="rmeta">${esc(e.judetNorm||e.judet||'—')} · Clasa ${e.clasa} · ${e.an}</div>
+      </div>
+      <div class="rright">
+        ${e.premiu?`<span class="pbadge">${esc(e.premiu)}</span>`:''}
+        <span class="sbadge">${e.punctaj!=null?e.punctaj:'—'}</span>
+        ${e.medalieSSMR?`<span class="mbadge m${e.medalieSSMR}">${e.medalieSSMR}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ─── JUDETE ─── */
+let jy='ALL';
+function buildJYFilter(){
+  const c=document.getElementById('jyf');
+  if(c.querySelectorAll('.btn').length>1)return;
+  YEARS.forEach(y=>{const b=document.createElement('button');b.className='btn';b.textContent=y;b.onclick=()=>setJY(y,b);c.appendChild(b);});
+}
+function setJY(y,b){jy=y;document.querySelectorAll('#jyf .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderJudete();}
+
+function renderJudete(){
+  const src=jy==='ALL'?ALL:ALL.filter(e=>String(e.an)===jy);
+  const map={};
+  src.forEach(e=>{const j=e.judetNorm;if(!j)return;if(!map[j])map[j]={a:0,s:0,b:0};const m=e.medalieSSMR;if(m==='AUR')map[j].a++;else if(m==='ARGINT')map[j].s++;else if(m==='BRONZ')map[j].b++;});
+  const list=Object.entries(map).map(([j,v])=>({j,...v,scor:v.a*5+v.s*3+v.b})).sort((x,y)=>y.a-x.a||y.s-x.s||y.b-x.b);
+  const maxA=list[0]?.a||1;
+
+  /* bars */
+  document.getElementById('jbars').innerHTML=list.slice(0,15).map(r=>`
+    <div class="jbar-row">
+      <span class="jbar-lbl">${esc(r.j)}</span>
+      <div class="jbar-track">
+        <div class="jbar-a" style="width:0" data-w="${(r.a/maxA*55).toFixed(1)}%"></div>
+        <div class="jbar-s" style="width:0" data-w="${(r.s/maxA*28).toFixed(1)}%"></div>
+        <div class="jbar-b" style="width:0" data-w="${(r.b/maxA*18).toFixed(1)}%"></div>
+      </div>
+      <span class="jbar-val">${r.a}</span>
+    </div>`).join('');
+  setTimeout(()=>{document.querySelectorAll('[data-w]').forEach(el=>{el.style.width=el.dataset.w;});},100);
+
+  /* table */
+  document.getElementById('jlist').innerHTML=list.map((r,i)=>{
+    const rkCls=i===0?'g1':i===1?'g2':i===2?'g3':'gn';
+    return `<div class="jrow" style="animation-delay:${i*.016}s">
+      <span class="jrk ${rkCls}">${i+1}</span>
+      <span class="jnm">${esc(r.j)}</span>
+      <span class="jcnt a">${r.a}</span>
+      <span class="jcnt s">${r.s}</span>
+      <span class="jcnt b">${r.b}</span>
+      <span class="jcnt t">${r.scor}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ─── HOF ELEVI ─── */
+function renderHOF(){
+  if(!HOF.length)return;
+  const trophies=['🥇','🥈','🥉'];
+  const posLabel=['LOCUL I','LOCUL II','LOCUL III'];
+
+  /* Build medal text lines for podium */
+  function podMedalLines(e){
+    const lines=[];
+    if(e.aur>0)   lines.push(`<div class="pod-mline a">${medalText(e.aur,'🥇')}</div>`);
+    if(e.argint>0) lines.push(`<div class="pod-mline s">${medalText(e.argint,'🥈')}</div>`);
+    if(e.bronz>0)  lines.push(`<div class="pod-mline b">${medalText(e.bronz,'🥉')}</div>`);
+    return `<div class="pod-medal-lines">${lines.join('')}</div>`;
+  }
+
+  /* Build medal pills for list rows */
+  function rowMedalPills(e){
+    const pills=[];
+    if(e.aur>0)    pills.push(`<span class="mpill a">${medalText(e.aur,'🥇')}</span>`);
+    if(e.argint>0)  pills.push(`<span class="mpill s">${medalText(e.argint,'🥈')}</span>`);
+    if(e.bronz>0)   pills.push(`<span class="mpill b">${medalText(e.bronz,'🥉')}</span>`);
+    return pills.join('');
+  }
+
+  document.getElementById('podium').innerHTML=`<div class="podium">${HOF.slice(0,3).map((e,i)=>`
+    <div class="pod p${i+1}">
+      <span class="pod-trophy">${trophies[i]}</span>
+      <div class="pod-pos">${posLabel[i]}</div>
+      <div class="pod-name">${esc(e.nume)}</div>
+      <div class="pod-jud">${esc(e.judet||'—')}</div>
+      <div class="pod-yrs">${e.ani.join(' · ')}</div>
+      ${podMedalLines(e)}
+    </div>`).join('')}</div>`;
+
+  document.getElementById('hoflist').innerHTML=HOF.slice(3).map((e,i)=>`
+    <div class="hof-row" style="animation-delay:${i*.016}s">
+      <span class="hof-rk">${i+4}</span>
+      <span class="hof-nm">${esc(e.nume)}</span>
+      <span class="hof-jd">${esc(e.judet||'—')}</span>
+      <span class="hof-yrs">${e.ani.join(' · ')}</span>
+      <div class="hof-mpills">${rowMedalPills(e)}</div>
+    </div>`).join('');
+}
+
+/* ─── COUNTER ANIM ─── */
+function animCount(el,target,dur=1400){
+  const t0=performance.now();
+  (function step(now){
+    const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,4);
+    el.textContent=Math.round(target*ease).toLocaleString('ro');
+    if(p<1)requestAnimationFrame(step);
+  })(t0);
+}
+
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ─── LOAD ─── */
+async function init(){
+  try{
+    const [r1,r2]=await Promise.all([fetch('onm_all.json'),fetch('hof_data.json')]);
+    const DATA=await r1.json();
+    const hofData=await r2.json();
+    HOF=hofData.hof||[];
+    JUDETE=hofData.judete||[];
+
+    ALL=[];
+    for(const[yr,yd]of Object.entries(DATA)){
+      for(const[cls,elevi]of Object.entries(yd.clase||{})){
+        for(const e of elevi){
+          ALL.push({...e,an:parseInt(yr),clasa:cls,judetNorm:normJ(e.judet)});
+        }
+      }
+    }
+
+    const med=ALL.filter(e=>e.medalieSSMR).length;
+    setTimeout(()=>{
+      animCount(document.getElementById('st-total'),ALL.length);
+      animCount(document.getElementById('st-med'),med,1600);
+    },500);
+  }catch(err){console.error(err);}
+}
+init();
+</script>
+</body>
+</html>
