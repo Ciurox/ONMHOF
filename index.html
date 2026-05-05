@@ -533,7 +533,9 @@ function trans(cb){
 
 /* ─── DATA ─── */
 let ALL=[], HOF=[], JUDETE=[];
-const YEARS=['2026','2025','2024','2023','2022','2019','2018','2017','2016','2014','2013','2012','2011','2010'];
+const YEARS=['2026','2025','2024','2023','2022','2021','2020','2019','2018','2017','2016','2015','2014','2013','2012','2011','2010','2009','2008','2007','2006','2005','2004','2003','2002'];
+const NO_ONM_YEARS=new Set(['2020','2021']); // COVID-19 - nu s-a organizat etapa națională
+const MISSING_YEARS=new Set(['2002','2003','2004','2005','2006','2007','2008','2009','2015']); // date indisponibile
 
 /* Judet normalization */
 const JM={
@@ -611,13 +613,29 @@ function buildYrFilter(){
   const c=document.getElementById('yf');
   if(c.childElementCount) return;
   c.innerHTML='<button class="btn on" onclick="setYF(\'ALL\',this)">Toți anii</button>'+
-    YEARS.map(y=>`<button class="btn" onclick="setYF('${y}',this)">${y}</button>`).join('');
+    YEARS.map(y=>{
+      const extra=NO_ONM_YEARS.has(y)?' title="Nu s-a organizat ONM (COVID-19)"'
+        :MISSING_YEARS.has(y)?' title="Date indisponibile"':'';
+      const dim=(NO_ONM_YEARS.has(y)||MISSING_YEARS.has(y))?'opacity:.42;':'';
+      return `<button class="btn" style="${dim}"${extra} onclick="setYF('${y}',this)">${y}</button>`;
+    }).join('');
 }
 function setMF(m,b){mf=m;document.querySelectorAll('#mf .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');doSearch();}
 function setYF(y,b){yf=y;document.querySelectorAll('#yf .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');doSearch();}
 
 function doSearch(){
   const q=(document.getElementById('srch').value||'').toLowerCase().trim();
+  // Mesaj special pentru ani fără date
+  if(yf!=='ALL'&&NO_ONM_YEARS.has(yf)){
+    document.getElementById('rc').textContent='';
+    document.getElementById('sr').innerHTML=`<div class="empty"><div class="empty-ic">🦠</div><div class="empty-tx">Etapa națională ONM nu s-a organizat în ${yf} din cauza pandemiei COVID-19.<br>SSMR a organizat în schimb <b>Olimpiada Națională Gazeta Matematică (ONGM)</b>.</div></div>`;
+    return;
+  }
+  if(yf!=='ALL'&&MISSING_YEARS.has(yf)){
+    document.getElementById('rc').textContent='';
+    document.getElementById('sr').innerHTML=`<div class="empty"><div class="empty-ic">📂</div><div class="empty-tx">Datele pentru ${yf} nu sunt disponibile momentan.<br>Sursa oficială: <a href="https://www.ssmr.ro/olimpiada/nationala/" target="_blank" style="color:var(--accent)">ssmr.ro/olimpiada/nationala</a></div></div>`;
+    return;
+  }
   let list=[...ALL];
   if(mf!=='ALL') list=list.filter(e=>e.medalieSSMR===mf);
   if(yf!=='ALL') list=list.filter(e=>String(e.an)===yf);
